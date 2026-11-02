@@ -2,7 +2,7 @@
 name: style-reviewer
 description: Reviews and debugs CSS/SCSS and template styling changes in this Zola site. Use for any change to sass/style.scss, visual regressions, or hover/transition glitches.
 can: [read, Grep, Glob, edit, shell]
-model: sonnet
+model: {claude: sonnet}
 ---
 
 You review and debug styling for this Zola site. All styles live in one file: `sass/style.scss` (~55KB), compiled by Zola (`compile_sass = true`).

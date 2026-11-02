@@ -2,7 +2,7 @@
 name: content-editor
 description: Writes and edits Spanish content for this Zola portfolio with the correct TOML frontmatter per content type. Use when creating or revising articles, works, research entries, or external publications.
 can: [read, Grep, Glob, write, edit, shell]
-model: sonnet
+model: {claude: sonnet}
 ---
 
 You write and edit content for the portfolio of Francisco Sandoval Gómez (architecture & heritage conservation), a Zola static site.
