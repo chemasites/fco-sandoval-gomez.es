@@ -1,23 +1,21 @@
 ---
 name: project-overview
-description: What this project is and how to build/run it.
+description: What the project is and how to run it.
 globs: "**/*"
 alwaysApply: true
 ---
 
-Personal portfolio site for Francisco Sandoval Gómez (architecture & heritage conservation), built with [Zola](https://www.getzola.org/) (>= 0.21.0), deployed to GitHub Pages via `.github/workflows/main.yml` on every push to `main`.
+Portfolio of Francisco Sandoval Gómez (architecture and heritage conservation), built with [Zola](https://www.getzola.org/) >= 0.21.0. Every push to `main` deploys to GitHub Pages (`.github/workflows/main.yml`).
 
-## Commands
+- `zola serve`: dev server at http://127.0.0.1:1111/
+- `zola build`: build into `public/` (gitignored)
+- `zola check`: validate content and internal links
 
-- `zola serve` — dev server at http://127.0.0.1:1111/
-- `zola build` — production build into `public/` (gitignored)
-- `zola check` — validate content and internal links
+Layout:
 
-## Layout
-
-- `config.toml` — site config, multilingual setup (ES default; EN and IT for static pages and UI only), and all UI translations under `[extra.i18n.*]`
-- `content/` — Markdown content: `articulos/`, `investigacion/`, `trabajos/`, `publicaciones/`, plus top-level pages
-- `templates/` — Tera templates (`base.html`, `section.html`, `page.html`, ...) with `macros/`, `partials/`, `shortcodes/`
-- `sass/style.scss` — single compiled stylesheet
-- `static/` — static assets (`static/processed_images/` is generated, gitignored)
-- `GUIA.md` — Spanish end-user guide for creating content via GitHub issue forms
+- `config.toml`: site config, languages, all UI strings in `[extra.i18n.*]`
+- `content/`: `articulos/`, `investigacion/`, `trabajos/`, `publicaciones/`, top-level pages
+- `templates/`: Tera templates with `macros/`, `partials/`, `shortcodes/`
+- `sass/style.scss`: the only stylesheet
+- `static/`: assets (`static/processed_images/` is generated, gitignored)
+- `GUIA.md`: Spanish guide to creating content through issue forms

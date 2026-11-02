@@ -1,20 +1,19 @@
 ---
 name: templates-and-styles
-description: Conventions for Tera templates and SCSS.
+description: Tera template and SCSS conventions.
 globs: "templates/**/*.html,sass/**/*.scss"
 alwaysApply: false
 ---
 
-## Templates (Tera)
+Templates:
 
-- `templates/base.html` is the shared shell; pages extend it.
-- Reusable pieces go in `templates/partials/` and `templates/macros/`; content-embeddable snippets in `templates/shortcodes/`.
-- Never hardcode user-facing text in templates — read it from `config.extra.i18n` so all three locales stay in sync.
-- Language-aware links must respect the current `lang` (ES at `/`, EN at `/en/`, IT at `/it/`).
-- Posts are Spanish-only. EN/IT listings read the Spanish section (`get_section` without `lang`), and cards carry the post's `lang` attribute.
+- Pages extend `templates/base.html`. Reusable pieces go in `partials/` and `macros/`; snippets embedded in content go in `shortcodes/`.
+- Read user-facing text from `config.extra.i18n`, never hardcode it.
+- Links respect the current `lang` (ES `/`, EN `/en/`, IT `/it/`).
+- EN/IT listings read the Spanish section (`get_section` without `lang`); cards carry the post's `lang` attribute.
 
-## Styles
+Styles:
 
-- All styles live in `sass/style.scss`, compiled by Zola (`compile_sass = true`). No inline styles in templates.
-- Site uses view transitions for navigation and minified HTML output; verify visual changes with `zola serve` before committing.
-- When debugging CSS, find the root-cause rule first (check global selectors like `a:hover`, `*`) — no surface patches.
+- Everything lives in `sass/style.scss` (`compile_sass = true`). No inline styles.
+- HTML is minified and navigation uses view transitions: check visual changes under `zola serve`.
+- Find the root-cause rule first, including global selectors (`a:hover`, `*`). No surface patches.

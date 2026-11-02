@@ -1,23 +1,18 @@
 ---
 name: new-content
-description: Scaffold a new content file (artículo, trabajo, investigación, or publicación) with correct frontmatter. Trigger on "new article", "nuevo artículo", "new content", "add a trabajo/investigación/publicación".
+description: Use to add a new artículo, trabajo, investigación or publicación ("new article", "nuevo artículo", "new content").
 ---
 
-# new-content
+1. Get the section: `articulos`, `trabajos`, `investigacion` or `publicaciones` (field meaning in `GUIA.md`).
+2. Read a recent file in that section and copy its frontmatter shape.
+3. Write `content/<section>/YYYY-MM-DD-kebab-slug.md` in Spanish. Never add `.en.md` or `.it.md`.
+4. Run `zola check`. Offer `zola serve` to preview.
 
-Create a new Spanish content file with the right structure for its section.
+Required fields:
 
-## Steps
+- `articulos`: title, description, category (`Patrimonio` or `Reflexiones`).
+- `trabajos`: title, description, category (`Rehabilitación` or `Investigación`), location.
+- `investigacion`: title, description, category (publication type); optional coauthors and `[[extra.links]]`.
+- `publicaciones`: title, description, source, url; fixed body linking the external page.
 
-1. Ask (or infer from the request) the content type: `articulos`, `trabajos`, `investigacion`, or `publicaciones` — and the required fields for that type (see `GUIA.md` for field semantics).
-2. Read one recent `.md` file in the target section and mirror its exact frontmatter shape (TOML between `+++`).
-3. Write `content/<section>/YYYY-MM-DD-kebab-slug.md` in Spanish. Posts are Spanish-only: never add `.en.md`/`.it.md`.
-4. Validate with `zola check`.
-5. Offer to preview with `zola serve`.
-
-## Required fields per type
-
-- **articulos**: title, description, category (`Patrimonio`|`Reflexiones`); optional image, body
-- **trabajos**: title, description, category (`Rehabilitación`|`Investigación`), location; optional image, body
-- **investigacion**: title, description/abstract, category (publication type), optional coauthors and `[[extra.links]]`
-- **publicaciones**: title, description, source, url; fixed body pointing to the external link
+`image` and a body are optional where not listed as fixed.

@@ -2,9 +2,6 @@
 requires: ">=0.91.0"
 version: 1
 
-# The release the generated files come from.
-requires: "0.85.0"
-
 sources:
   agents: .agnostic-ai/agents
   skills: .agnostic-ai/skills
