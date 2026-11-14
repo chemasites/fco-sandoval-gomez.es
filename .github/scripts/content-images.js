@@ -20,7 +20,7 @@ async function download(url, fetch) {
 // points the post at the copies. An image that cannot be fetched or resized
 // keeps its GitHub URL, so the post still publishes.
 async function localizeImages(result, { fetch = globalThis.fetch, fs = require('fs'), resize = resizeImage, staticRoot = 'static', log = console.warn } = {}) {
-  const slug = path.basename(result.filename, '.md').replace(/^\d{4}-\d{2}-\d{2}-/, '');
+  const slug = path.basename(result.filename, '.md');
   const folder = path.posix.join('images', result.contentType, slug);
   const directory = path.join(staticRoot, folder);
   const stored = new Map();
@@ -52,7 +52,7 @@ async function localizeImages(result, { fetch = globalThis.fetch, fs = require('
 
   const ids = new Set(assets.values());
   for (const [id, name] of stored) {
-    if (!ids.has(id)) fs.rmSync(path.join(directory, name));
+    if (!ids.has(id) && !result.content.includes(`${folder}/${name}`)) fs.rmSync(path.join(directory, name));
   }
 
   let content = result.content;

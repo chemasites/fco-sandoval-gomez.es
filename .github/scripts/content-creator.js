@@ -83,7 +83,7 @@ function saveContent(result, fs = require('fs'), root = 'content') {
     if (path.basename(path.dirname(existing)) !== result.contentType) {
       throw new Error(`Issue #${result.issueNumber} already owns ${existing}, which is not in ${result.contentType}.`);
     }
-    const aliases = /^aliases = .*$/m.exec(frontMatter(fs.readFileSync(existing, 'utf8')));
+    const aliases = /^aliases[ \t]*=[ \t]*\[(?:"""[\s\S]*?"""|'''[\s\S]*?'''|"(?:\\.|[^"\\])*"|'[^']*'|#[^\n]*|[^\]"'#])*\]/m.exec(frontMatter(fs.readFileSync(existing, 'utf8')));
     const content = aliases ? result.content.replace('\n[extra]\n', `\n${aliases[0]}\n[extra]\n`) : result.content;
     fs.writeFileSync(existing, content);
     return { ...result, filename: existing, content, updated: true };
