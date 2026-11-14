@@ -18,9 +18,9 @@ permissions:
   pages: write
   id-token: write
 
-# Per issue: a queued edit replaces an older queued edit of the same form only.
 concurrency:
-  group: content-writer-${{ github.event.issue.number }}
+  group: content-writer
+  queue: max
   cancel-in-progress: false
 
 jobs:

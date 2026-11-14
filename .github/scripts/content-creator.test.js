@@ -332,9 +332,11 @@ describe('content owned by an issue', () => {
     expect(fs.readFileSync(first.filename, 'utf8')).toContain('title = "Otro título"');
   });
 
-  it('keeps the aliases of the existing file', () => {
+  it.each([
+    'aliases = ["/en/articulos/post/"]',
+    'aliases = [\n  "/en/articulos/post/", # retired URL ]\n  \'/it/articulos/post/\',\n]',
+  ])('keeps the aliases of the existing file: %s', aliases => {
     const first = save(create('Post', 42));
-    const aliases = 'aliases = ["/en/articulos/post/"]';
     fs.writeFileSync(first.filename, fs.readFileSync(first.filename, 'utf8').replace('[extra]', `${aliases}\n[extra]`));
     const second = save(create('Post', 42, 'Nuevo texto'));
     expect(second.content).toContain(`${aliases}\n[extra]\nsource_issue = 42\n`);

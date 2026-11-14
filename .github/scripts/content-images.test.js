@@ -12,12 +12,12 @@ const post = (...bodyIds) => `+++\ntitle = "Post"\n\n[extra]\nimage = "${asset(H
 describe('localizeImages', () => {
   let root, options, fetched;
   const respond = (type, ok = true) => ({ ok, status: ok ? 200 : 404, headers: { get: () => type }, arrayBuffer: async () => new Uint8Array([1, 2, 3]).buffer });
-  const run = content => {
-    const filename = path.join(root, '2026-09-08-post.md');
+  const run = (content, name = '2026-09-08-post.md') => {
+    const filename = path.join(root, name);
     fs.writeFileSync(filename, content);
     return localizeImages({ filename, content, contentType: 'articulos' }, options);
   };
-  const folder = () => path.join(root, 'static', 'images', 'articulos', 'post');
+  const folder = () => path.join(root, 'static', 'images', 'articulos', '2026-09-08-post');
 
   beforeEach(() => {
     root = fs.mkdtempSync(path.join(os.tmpdir(), 'content-images-'));
@@ -33,8 +33,8 @@ describe('localizeImages', () => {
 
   it('stores resized copies and points the post at them', async () => {
     const result = await run(post(BODY, BODY));
-    expect(result.content).toContain(`image = "images/articulos/post/${HERO}.jpg"`);
-    expect(result.content).toContain(`![foto](/images/articulos/post/${BODY}.png)`);
+    expect(result.content).toContain(`image = "images/articulos/2026-09-08-post/${HERO}.jpg"`);
+    expect(result.content).toContain(`![foto](/images/articulos/2026-09-08-post/${BODY}.png)`);
     expect(result.content).not.toContain('user-attachments');
     expect(fs.readFileSync(result.filename, 'utf8')).toBe(result.content);
     expect(fs.readFileSync(path.join(folder(), `${HERO}.jpg`), 'utf8')).toContain('resized');
@@ -47,8 +47,23 @@ describe('localizeImages', () => {
     fs.writeFileSync(path.join(folder(), 'portada-manual.jpg'), 'manual');
     const result = await run(post(BODY));
     expect(fetched).toEqual([]);
-    expect(result.content).toContain(`/images/articulos/post/${BODY}.png`);
+    expect(result.content).toContain(`/images/articulos/2026-09-08-post/${BODY}.png`);
     expect(fs.readdirSync(folder()).sort()).toEqual([`${HERO}.jpg`, `${BODY}.png`, 'portada-manual.jpg'].sort());
+  });
+
+  it('keeps images referenced through their stored URLs when editing', async () => {
+    const first = await run(post(BODY));
+    const result = await run(first.content);
+    expect(result.content).toBe(first.content);
+    expect(fs.readdirSync(folder()).sort()).toEqual([`${HERO}.jpg`, `${BODY}.png`].sort());
+  });
+
+  it('keeps same-title posts on different dates in separate image folders', async () => {
+    const first = await run(post(BODY));
+    const second = await run(post(GONE), '2026-09-09-post.md');
+    expect(/\nimage = (.*)/.exec(second.content)[1]).not.toBe(/\nimage = (.*)/.exec(first.content)[1]);
+    const bodyUrl = /!\[foto\]\(([^)]+)\)/.exec(first.content)[1];
+    expect(fs.existsSync(path.join(options.staticRoot, bodyUrl))).toBe(true);
   });
 
   it.each([
@@ -57,7 +72,8 @@ describe('localizeImages', () => {
     ['times out', async () => { throw new Error('timeout'); }],
   ])('keeps the GitHub URL when the file %s', async (_, fetch) => {
     const content = post(BODY);
-    const result = await run(content, options.fetch = fetch);
+    options.fetch = fetch;
+    const result = await run(content);
     expect(result.content).toBe(content);
     expect(fs.existsSync(folder())).toBe(false);
   });
