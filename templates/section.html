@@ -81,11 +81,25 @@
 <section class="publicaciones-page">
     <div class="container">
         {{ <sections.page_header_styled title={section.title} description={section.description or ""} note={note} /> }}
+        <nav class="year-nav" aria-label="{{ config.extra.i18n[lang].years_nav }}">
+            <ul>
+                {% for page in pages %}
+                {% if loop.first or pages[loop.index0 - 1].year != page.year %}
+                <li><a href="#year-{{ page.year }}">{{ page.year }}</a></li>
+                {% endif %}
+                {% endfor %}
+            </ul>
+        </nav>
         <div class="publicaciones-list">
             {% for page in pages %}
-                {% set year = page.date | date(format="%Y") %}
-                {% if loop.first or (pages[loop.index0 - 1].date | date(format="%Y")) != year %}{% set year_label = year %}{% else %}{% set year_label = "" %}{% endif %}
-                {{ <cards.publicacion_card item={page} i18n={config.extra.i18n} year={year_label} /> }}
+            {% if loop.first or pages[loop.index0 - 1].year != page.year %}
+            {% if not loop.first %}</div></section>{% endif %}
+            <section class="year-group" aria-labelledby="year-{{ page.year }}">
+                <h2 class="biblio-year" id="year-{{ page.year }}">{{ page.year }}</h2>
+                <div class="year-group__entries">
+            {% endif %}
+                {{ <cards.publicacion_card item={page} i18n={config.extra.i18n} /> }}
+            {% if loop.last %}</div></section>{% endif %}
             {% endfor %}
         </div>
     </div>

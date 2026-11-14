@@ -151,9 +151,8 @@
 {% endcomponent cards.investigacion_card %}
 
 {# Publicacion externa card - text only list item #}
-{% component cards.publicacion_card(item, i18n, year="") %}
+{% component cards.publicacion_card(item, i18n) %}
 <article class="publicacion-card" lang="{{ item.lang }}">
-    <span class="biblio-year">{{ year }}</span>
     <div class="publicacion-card__content">
         <div class="post-meta">
             {% if item.extra.source %}
