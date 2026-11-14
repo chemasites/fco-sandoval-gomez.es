@@ -1,4 +1,5 @@
-{% set alignment = align | default(value="left") %}
+{% component media(align="left") %}
+{% <compact> %}
 {% set content = body | markdown | trim %}
 {% set before_first_p = content | split(pat="<p>") | first %}
 
@@ -13,7 +14,9 @@
     {% set text_part = content | replace(from=before_first_p, to="") | trim %}
 {% endif %}
 
-<div class="media-block media-{{ alignment }}">
+<div class="media-block media-{{ align }}">
     <figure class="media-image img-skeleton">{{ image_part | safe }}</figure>
     {{ text_part | safe }}
 </div>
+{% </compact> %}
+{% endcomponent media %}

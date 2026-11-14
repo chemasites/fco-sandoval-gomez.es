@@ -1,11 +1,9 @@
 {% extends "base.html" %}
-{% import "macros/dates.html" as dates %}
-{% import "macros/images.html" as images %}
 
 {% block title %}{{ page.title }} | Francisco Sandoval Gómez{% endblock %}
 
 {% block head %}
-{% if page.extra.image and page.extra.image is starting_with("http") %}
+{% if page.extra.image and page.extra.image is starting_with(pat="http") %}
 <link rel="preload" as="image"
     href="https://wsrv.nl/?url={{ page.extra.image | urlencode }}&w=1200&q=85&output=webp"
     imagesrcset="https://wsrv.nl/?url={{ page.extra.image | urlencode }}&w=800&q=85&output=webp 800w, https://wsrv.nl/?url={{ page.extra.image | urlencode }}&w=1200&q=85&output=webp 1200w, https://wsrv.nl/?url={{ page.extra.image | urlencode }}&w=1600&q=85&output=webp 1600w"
@@ -17,7 +15,7 @@
 <article class="article-page">
     {% if page.extra.image %}
     <div class="article-hero img-skeleton">
-        {{ images::hero_image(url=page.extra.image, alt=page.title) }}
+        {{ <images.hero_image url={page.extra.image} alt={page.title} /> }}
     </div>
     {% endif %}
 
@@ -28,7 +26,7 @@
                 <span class="category">{{ page.extra.category | upper }}</span>
                 {% endif %}
                 {% if page.date %}
-                <span class="date">{{ dates::fecha_completa(date=page.date, lang=page.lang) }}</span>
+                <span class="date">{{ <dates.fecha_completa date={page.date} lang={page.lang} months={config.extra.i18n[page.lang].months} /> }}</span>
                 {% endif %}
             </div>
             <h1>{{ page.title }}</h1>
@@ -72,7 +70,7 @@
             {% for image in page.extra.gallery %}
             <figure>
                 <div class="article-gallery__img img-skeleton">
-                    {{ images::gallery_image(url=image.src, alt=image.alt | default(value='')) }}
+                    {{ <images.gallery_image url={image.src} alt={image.alt or ''} /> }}
                 </div>
                 {% if image.caption %}
                 <figcaption>{{ image.caption }}</figcaption>

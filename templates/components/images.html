@@ -1,10 +1,10 @@
-{# Image optimization macros using wsrv.nl proxy for external images #}
+{# Image optimization components using wsrv.nl proxy for external images #}
 {# wsrv.nl provides: WebP conversion, resizing, caching, and optimization #}
 
 {# Optimized image for cards (lazy loaded, responsive) #}
 {# Typical card sizes: 400px mobile, 600px tablet, 800px desktop #}
-{% macro card_image(url, alt, sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 400px") %}
-{% if url is starting_with("http") %}
+{% component images.card_image(url, alt, sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 400px") %}
+{% if url is starting_with(pat="http") %}
 <img
     data-full-src="{{ url }}"
     src="https://wsrv.nl/?url={{ url | urlencode }}&w=400&q=80&output=webp"
@@ -34,12 +34,12 @@
     onload="this.parentElement.classList.add('loaded')"
 >
 {% endif %}
-{% endmacro %}
+{% endcomponent images.card_image %}
 
 {# Optimized hero image (eager loaded, high priority, larger sizes) #}
 {# Hero sizes: 800px mobile, 1200px tablet, 1600px desktop #}
-{% macro hero_image(url, alt, sizes="100vw") %}
-{% if url is starting_with("http") %}
+{% component images.hero_image(url, alt, sizes="100vw") %}
+{% if url is starting_with(pat="http") %}
 <img
     data-full-src="{{ url }}"
     src="https://wsrv.nl/?url={{ url | urlencode }}&w=1200&q=85&output=webp"
@@ -71,12 +71,12 @@
     onload="this.parentElement.classList.add('loaded')"
 >
 {% endif %}
-{% endmacro %}
+{% endcomponent images.hero_image %}
 
 {# Optimized gallery image (lazy loaded, medium sizes) #}
 {# onclick: optional click handler for lightbox #}
-{% macro gallery_image(url, alt="", onclick="", sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw") %}
-{% if url is starting_with("http") %}
+{% component images.gallery_image(url, alt="", onclick="", sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw") %}
+{% if url is starting_with(pat="http") %}
 <img
     data-full-src="{{ url }}"
     src="https://wsrv.nl/?url={{ url | urlencode }}&w=600&q=80&output=webp"
@@ -109,4 +109,4 @@
     onload="this.parentElement.classList.add('loaded')"
 >
 {% endif %}
-{% endmacro %}
+{% endcomponent images.gallery_image %}

@@ -1,5 +1,5 @@
-{% set full_path = current_path | default(value="/") %}
-{% set path = full_path | trim_start_matches(pat="/en/") | trim_start_matches(pat="/it/") | trim_start_matches(pat="/") %}
+{% set full_path = current_path or "/" %}
+{% set path = full_path | trim_start(pat="/en/") | trim_start(pat="/it/") | trim_start(pat="/") %}
 {% set lang_prefix = "" %}
 {% if lang == "en" %}{% set lang_prefix = "/en" %}{% elif lang == "it" %}{% set lang_prefix = "/it" %}{% endif %}
 <header class="site-header">
@@ -11,11 +11,11 @@
         </a>
         <nav id="main-nav" class="main-nav">
             <ul>
-                <li><a href="{{ lang_prefix }}/articulos/" {% if full_path is containing("/articulos") %}class="active"{% endif %}>{% if lang == "en" %}Articles{% elif lang == "it" %}Articoli{% else %}Artículos{% endif %}</a></li>
-                <li><a href="{{ lang_prefix }}/trabajos/" {% if full_path is containing("/trabajos") %}class="active"{% endif %}>{% if lang == "en" %}Works{% elif lang == "it" %}Lavori{% else %}Trabajos{% endif %}</a></li>
-                <li><a href="{{ lang_prefix }}/investigacion/" {% if full_path is containing("/investigacion") %}class="active"{% endif %}>{% if lang == "en" %}Research{% elif lang == "it" %}Ricerca{% else %}Investigación{% endif %}</a></li>
-                <li><a href="{{ lang_prefix }}/publicaciones/" {% if full_path is containing("/publicaciones") %}class="active"{% endif %}>{% if lang == "en" %}Publications{% elif lang == "it" %}Pubblicazioni{% else %}Publicaciones{% endif %}</a></li>
-                <li><a href="{{ lang_prefix }}/sobre-mi/" {% if full_path is containing("/sobre-mi") %}class="active"{% endif %}>{% if lang == "en" %}About me{% elif lang == "it" %}Chi sono{% else %}Sobre mí{% endif %}</a></li>
+                <li><a href="{{ lang_prefix }}/articulos/" {% if full_path is containing(pat="/articulos") %}class="active"{% endif %}>{% if lang == "en" %}Articles{% elif lang == "it" %}Articoli{% else %}Artículos{% endif %}</a></li>
+                <li><a href="{{ lang_prefix }}/trabajos/" {% if full_path is containing(pat="/trabajos") %}class="active"{% endif %}>{% if lang == "en" %}Works{% elif lang == "it" %}Lavori{% else %}Trabajos{% endif %}</a></li>
+                <li><a href="{{ lang_prefix }}/investigacion/" {% if full_path is containing(pat="/investigacion") %}class="active"{% endif %}>{% if lang == "en" %}Research{% elif lang == "it" %}Ricerca{% else %}Investigación{% endif %}</a></li>
+                <li><a href="{{ lang_prefix }}/publicaciones/" {% if full_path is containing(pat="/publicaciones") %}class="active"{% endif %}>{% if lang == "en" %}Publications{% elif lang == "it" %}Pubblicazioni{% else %}Publicaciones{% endif %}</a></li>
+                <li><a href="{{ lang_prefix }}/sobre-mi/" {% if full_path is containing(pat="/sobre-mi") %}class="active"{% endif %}>{% if lang == "en" %}About me{% elif lang == "it" %}Chi sono{% else %}Sobre mí{% endif %}</a></li>
             </ul>
             <div class="lang-nav lang-nav--mobile">
                 {% include "partials/language-links.html" %}

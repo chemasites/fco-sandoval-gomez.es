@@ -24,18 +24,18 @@
 {% set meta_image = "images/sando-homepage.jpeg" %}
 {% set translations = [] %}
 {% if page %}
-    {% set meta_title = page.title | default(value=config.title) %}
-    {% set meta_description = page.description | default(value=config.description) %}
-    {% set meta_image = page.extra.image | default(value=meta_image) %}
+    {% set meta_title = page.title or config.title %}
+    {% set meta_description = page.description or config.description %}
+    {% set meta_image = page.extra.image or meta_image %}
     {% set translations = page.translations %}
 {% elif section %}
-    {% set meta_title = section.title | default(value=config.title) %}
-    {% set meta_description = section.description | default(value=config.description) %}
-    {% set meta_image = section.extra.image | default(value=meta_image) %}
+    {% set meta_title = section.title or config.title %}
+    {% set meta_description = section.description or config.description %}
+    {% set meta_image = section.extra.image or meta_image %}
     {% set translations = section.translations %}
 {% endif %}
 {% if not meta_image %}{% set meta_image = "images/sando-homepage.jpeg" %}{% endif %}
-{% if meta_image is starting_with("http") %}
+{% if meta_image is starting_with(pat="http") %}
     {% set meta_image_url = meta_image %}
 {% else %}
     {% set meta_image_url = get_url(path=meta_image) %}
@@ -43,12 +43,12 @@
 <meta name="description" content="{{ meta_description }}">
 <meta name="author" content="{{ config.extra.author }}">
 <meta name="robots" content="index, follow">
-<link rel="canonical" href="{{ current_url | default(value=config.base_url) }}">
+<link rel="canonical" href="{{ current_url or config.base_url }}">
 
 {# Pagination can differ between languages. Advertise only known equivalents. #}
 {% if not paginator or paginator.current_index == 1 %}
 {% for translation in translations %}
-{% set translation_lang = translation.lang | default(value=config.default_language) %}
+{% set translation_lang = translation.lang or config.default_language %}
 <link rel="alternate" hreflang="{{ translation_lang }}" href="{{ translation.permalink }}">
 {% if translation_lang == config.default_language %}
 <link rel="alternate" hreflang="x-default" href="{{ translation.permalink }}">
@@ -57,13 +57,13 @@
 {% endif %}
 
 <meta property="og:type" content="{% if page and page.date %}article{% else %}website{% endif %}">
-<meta property="og:url" content="{{ current_url | default(value=config.base_url) }}">
+<meta property="og:url" content="{{ current_url or config.base_url }}">
 <meta property="og:title" content="{{ meta_title }}">
 <meta property="og:description" content="{{ meta_description }}">
 <meta property="og:site_name" content="{{ config.title }}">
 <meta property="og:locale" content="{% if lang == 'en' %}en_US{% elif lang == 'it' %}it_IT{% else %}es_ES{% endif %}">
 <meta property="og:image" content="{{ meta_image_url }}">
-{% if not (meta_image is starting_with("http")) %}
+{% if not (meta_image is starting_with(pat="http")) %}
 {% set image_metadata = get_image_metadata(path=meta_image) %}
 <meta property="og:image:width" content="{{ image_metadata.width }}">
 <meta property="og:image:height" content="{{ image_metadata.height }}">
@@ -147,7 +147,7 @@ h1,h2,h3,h4,h5,h6{font-family:'Libre Baskerville',Georgia,serif;font-weight:400;
     "url": {{ config.base_url | json_encode() | replace(from="<", to="\\u003c") | safe }}
   },
   "datePublished": {{ page.date | date(format="%Y-%m-%d") | json_encode() | replace(from="<", to="\\u003c") | safe }},
-  "dateModified": {{ page.updated | default(value=page.date) | date(format="%Y-%m-%d") | json_encode() | replace(from="<", to="\\u003c") | safe }},
+  "dateModified": {{ (page.updated or page.date) | date(format="%Y-%m-%d") | json_encode() | replace(from="<", to="\\u003c") | safe }},
   "mainEntityOfPage": {{ page.permalink | json_encode() | replace(from="<", to="\\u003c") | safe }}
 }
 </script>
@@ -162,7 +162,7 @@ h1,h2,h3,h4,h5,h6{font-family:'Libre Baskerville',Georgia,serif;font-weight:400;
     {
       "@type": "ListItem",
       "position": {{ loop.index }},
-      "name": {{ ancestor.title | default(value=config.title) | json_encode() | replace(from="<", to="\\u003c") | safe }},
+      "name": {{ (ancestor.title or config.title) | json_encode() | replace(from="<", to="\\u003c") | safe }},
       "item": {{ ancestor.permalink | json_encode() | replace(from="<", to="\\u003c") | safe }}
     },
     {% endfor %}
@@ -192,7 +192,7 @@ h1,h2,h3,h4,h5,h6{font-family:'Libre Baskerville',Georgia,serif;font-weight:400;
   "@type": "WebSite",
   "name": {{ config.title | json_encode() | replace(from="<", to="\\u003c") | safe }},
   "url": {{ config.base_url | json_encode() | replace(from="<", to="\\u003c") | safe }},
-  "inLanguage": {{ lang | default(value=config.default_language) | json_encode() | replace(from="<", to="\\u003c") | safe }},
+  "inLanguage": {{ (lang or config.default_language) | json_encode() | replace(from="<", to="\\u003c") | safe }},
   "author": {
     "@type": "Person",
     "name": {{ config.extra.author | json_encode() | replace(from="<", to="\\u003c") | safe }},
