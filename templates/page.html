@@ -13,12 +13,6 @@
 
 {% block content %}
 <article class="article-page">
-    {% if page.extra.image %}
-    <div class="article-hero img-skeleton">
-        {{ <images.hero_image url={page.extra.image} alt={page.title} /> }}
-    </div>
-    {% endif %}
-
     <div class="container article-container">
         <header class="article-header">
             <div class="post-meta">
@@ -40,6 +34,12 @@
             </p>
             {% endif %}
         </header>
+
+        {% if page.extra.image %}
+        <div class="article-hero img-skeleton">
+            {{ <images.hero_image url={page.extra.image} alt={page.title} sizes="(max-width: 1264px) 100vw, 1200px" /> }}
+        </div>
+        {% endif %}
 
         <div class="article-body prose">
             {{ page.content | safe }}

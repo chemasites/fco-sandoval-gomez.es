@@ -97,6 +97,8 @@ footer_dev = "Desarrollado por"
 search_placeholder = "Buscar..."
 search_no_results = "No se encontraron resultados"
 spanish_only_note = "Estos contenidos se publican en español."
+hero_caption = "Fig. 01 · Axonometría"
+entries_label = "entradas"
 
 [extra.i18n.en]
 months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
@@ -133,6 +135,8 @@ footer_dev = "Developed by"
 search_placeholder = "Search..."
 search_no_results = "No results found"
 spanish_only_note = "These entries are published in Spanish."
+hero_caption = "Fig. 01 · Axonometry"
+entries_label = "entries"
 
 [extra.i18n.it]
 months = ["gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno", "luglio", "agosto", "settembre", "ottobre", "novembre", "dicembre"]
@@ -169,6 +173,8 @@ footer_dev = "Sviluppato da"
 search_placeholder = "Cerca..."
 search_no_results = "Nessun risultato trovato"
 spanish_only_note = "Questi contenuti sono pubblicati in spagnolo."
+hero_caption = "Fig. 01 · Assonometria"
+entries_label = "voci"
 
 # The site answers automated requests with 406 Not Acceptable.
 [link_checker]
