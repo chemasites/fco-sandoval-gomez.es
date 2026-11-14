@@ -2,13 +2,30 @@
  * Content Creator - Parses GitHub issue forms and generates Zola markdown files
  */
 
+const path = require('path');
+
+// A mistake the author can fix in the form. Its message is shown in the issue.
+class FormError extends Error {}
+
+const FIELD_LABELS = {
+  titulo: 'Título',
+  descripcion: 'Descripción',
+  categoria: 'Categoría',
+  ubicacion: 'Ubicación',
+  ano: 'Año',
+  tipo_de_publicacion: 'Tipo de publicación',
+  fuente: 'Fuente',
+  url: 'URL',
+  enlace: 'Enlace',
+};
+
 /**
  * Parse issue body from GitHub forms format
  * @param {string} body - Raw issue body text
  * @returns {Object} Parsed key-value pairs
  */
 function parseIssueBody(body) {
-  if (typeof body !== 'string') throw new Error('El formulario está vacío.');
+  if (typeof body !== 'string') throw new FormError('El formulario está vacío.');
   const sections = {};
   const normalized = body.replace(/\r\n/g, '\n');
   // Contenido is the final field in both long-form templates. Its headings
@@ -21,7 +38,7 @@ function parseIssueBody(body) {
     const key = match[1].trim().toLowerCase()
       .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
       .replace(/[^a-z0-9]+/g, '_');
-    if (Object.hasOwn(sections, key)) throw new Error(`Campo repetido: ${match[1]}`);
+    if (Object.hasOwn(sections, key)) throw new FormError(`Campo repetido: ${match[1]}`);
     const value = match[2].trim();
     sections[key] = value === '_No response_' ? '' : value;
   }
@@ -38,16 +55,51 @@ function tomlString(value) {
   return JSON.stringify(String(value ?? ''));
 }
 
-function saveContent(result, fs = require('fs')) {
+const CONTENT_DIRS = ['articulos', 'investigacion', 'trabajos', 'publicaciones'];
+
+function frontMatter(text) {
+  return /^\+\+\+\n([\s\S]*?)\n\+\+\+/.exec(text)?.[1] ?? '';
+}
+
+function findIssueFile(issueNumber, fs = require('fs'), root = 'content') {
+  const marker = new RegExp(`^source_issue = ${issueNumber}$`, 'm');
+  for (const dir of CONTENT_DIRS) {
+    const folder = path.join(root, dir);
+    if (!fs.existsSync(folder)) continue;
+    for (const name of fs.readdirSync(folder).sort()) {
+      if (!name.endsWith('.md')) continue;
+      const file = path.join(folder, name);
+      if (marker.test(frontMatter(fs.readFileSync(file, 'utf8')))) return file;
+    }
+  }
+  return null;
+}
+
+// An edited issue rewrites the file it created. The filename stays, so the
+// public URL survives a new title or date.
+function saveContent(result, fs = require('fs'), root = 'content') {
+  const existing = result.issueNumber ? findIssueFile(result.issueNumber, fs, root) : null;
+  if (existing) {
+    if (path.basename(path.dirname(existing)) !== result.contentType) {
+      throw new Error(`Issue #${result.issueNumber} already owns ${existing}, which is not in ${result.contentType}.`);
+    }
+    const aliases = /^aliases = .*$/m.exec(frontMatter(fs.readFileSync(existing, 'utf8')));
+    const content = aliases ? result.content.replace('\n[extra]\n', `\n${aliases[0]}\n[extra]\n`) : result.content;
+    fs.writeFileSync(existing, content);
+    return { ...result, filename: existing, content, updated: true };
+  }
+  if (result.published) {
+    throw new FormError('Este contenido se publicó antes de que el formulario permitiera editar, o su archivo se borró. Edita el archivo en la carpeta content/ (ver GUIA.md).');
+  }
   try {
     fs.writeFileSync(result.filename, result.content, { flag: 'wx' });
   } catch (error) {
     if (error.code === 'EEXIST') {
-      if (result.issueNumber && fs.readFileSync(result.filename, 'utf8') === result.content) return;
-      throw new Error('Ya existe contenido con este título y fecha. Edita el existente o cambia el título o la fecha.');
+      throw new FormError('Ya existe contenido con este título y fecha. Edita el existente o cambia el título o la fecha.');
     }
     throw error;
   }
+  return { ...result, updated: false };
 }
 
 /**
@@ -221,7 +273,7 @@ url = ${tomlString(data.url)}
  * @param {string[]} labels - Issue labels
  * @returns {Object} { filename, content, contentType, title }
  */
-function createContent(body, labels, { defaultDate, issueNumber } = {}) {
+function createContent(body, labels, { defaultDate, issueNumber, published = false } = {}) {
   const types = {
     'nuevo-articulo': ['categoria'],
     'nuevo-trabajo': ['categoria', 'ubicacion', 'ano'],
@@ -232,18 +284,18 @@ function createContent(body, labels, { defaultDate, issueNumber } = {}) {
   if (selected.length !== 1) throw new Error('Unknown content type: selecciona un único tipo de contenido.');
   const data = parseIssueBody(body);
   for (const field of ['titulo', 'descripcion', ...types[selected[0]]]) {
-    if (!data[field]?.trim()) throw new Error(`Falta un campo obligatorio: ${field}`);
+    if (!data[field]?.trim()) throw new FormError(`Falta un campo obligatorio: ${FIELD_LABELS[field]}`);
   }
-  if (!slugify(data.titulo)) throw new Error('El título debe contener letras o números.');
-  if (!cleanDescription(data.descripcion)) throw new Error('La descripción debe contener texto.');
+  if (!slugify(data.titulo)) throw new FormError('El título debe contener letras o números.');
+  if (!cleanDescription(data.descripcion)) throw new FormError('La descripción debe contener texto.');
   const today = defaultDate || new Date().toISOString().split('T')[0];
   const date = data.fecha ? formatDate(data.fecha) : today;
-  if (!date) throw new Error('Fecha no válida. Usa una fecha real en formato AAAA-MM-DD.');
+  if (!date) throw new FormError('Fecha no válida. Usa una fecha real en formato AAAA-MM-DD.');
   for (const field of ['enlace', 'url']) {
     if (data[field]) {
       let url;
       try { url = new URL(data[field]); } catch { /* rejected below */ }
-      if (!url || !['https:', 'http:'].includes(url.protocol)) throw new Error(`URL no válida: ${field}`);
+      if (!url || !['https:', 'http:'].includes(url.protocol)) throw new FormError(`URL no válida: ${FIELD_LABELS[field]}`);
     }
   }
 
@@ -265,10 +317,12 @@ function createContent(body, labels, { defaultDate, issueNumber } = {}) {
     if (!Number.isSafeInteger(issueNumber) || issueNumber < 1) throw new Error('Invalid issue number');
     result.content = result.content.replace('[extra]\n', `[extra]\nsource_issue = ${issueNumber}\n`);
   }
-  return { ...result, title: data.titulo, issueNumber };
+  return { ...result, title: data.titulo, issueNumber, published };
 }
 
 module.exports = {
+  FormError,
+  findIssueFile,
   parseIssueBody,
   tomlString,
   saveContent,

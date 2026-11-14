@@ -36,8 +36,7 @@ Haz clic en **Get started** junto al tipo que quieras crear.
 El sistema valida el contenido y despliega la web. El contenido se publica en español, sin traducciones.
 - Recibirás un comentario con el enlace cuando termine el despliegue.
 - El issue se cierra cuando la publicación está confirmada.
-- Si aparece un error, sigue el enlace a la ejecución. Corrige el formulario si es necesario y usa **Re-run all jobs** para reintentar. No abras otro formulario.
-- Si el texto ya se guardó y necesitas cambiarlo, sigue las instrucciones de edición de archivos de esta guía.
+- Si algo falla, el comentario te dice qué campo corregir. Edita el formulario y guarda: se vuelve a intentar solo. No abras otro formulario.
 
 ---
 
@@ -136,7 +135,18 @@ Cuando escribas contenido, puedes usar estos formatos:
 
 ## Editar o borrar contenido
 
-### Editar un contenido existente
+### Editar un contenido creado con el formulario
+
+1. Abre el issue con el que lo creaste (pestana **Issues**, filtro **Closed**). El comentario de publicación enlaza la página.
+2. Haz clic en los tres puntos (**···**) arriba a la derecha del formulario > **Edit**
+3. Cambia lo que quieras y haz clic en **Update comment**
+4. En unos 2 minutos recibirás un comentario cuando la web esté actualizada
+
+La dirección de la página no cambia aunque cambies el título. El formulario manda: si además editaste el archivo a mano, esos cambios se pierden al guardar el formulario.
+
+### Editar un archivo directamente
+
+Para contenido que no se creó con el formulario, o que se publicó antes de noviembre de 2026 (el formulario te avisa si es el caso):
 
 1. Ve a la carpeta `content/` en GitHub
 2. Navega a la subcarpeta correspondiente (articulos, investigacion, trabajos, publicaciones)
@@ -164,8 +174,8 @@ Espera 1-2 minutos. La web se actualiza automaticamente despues de cada cambio. 
 
 ### El issue se cerro pero no veo el contenido
 
-Revisa la pestana **Actions** para ver si hubo algun error. Si hay un error, revisa su mensaje y reintenta la ejecución original. No abras otro issue para el mismo contenido.
+Lee el último comentario del issue: explica el error. Edita el formulario para reintentar. No abras otro issue para el mismo contenido.
 
 ### Quiero cambiar la imagen de un contenido
 
-Edita el archivo directamente en GitHub y cambia la URL de la imagen en el campo `image = "..."`.
+Edita el formulario y arrastra la imagen nueva al campo "Imagen destacada". Para contenido antiguo, edita el archivo y cambia el campo `image = "..."`.

@@ -291,7 +291,7 @@ describe('publishing safeguards', () => {
   it('accepts a real leap day', () => expect(formatDate('2024-2-29')).toBe('2024-02-29'));
 
   it('rejects missing required data and ambiguous content types', () => {
-    expect(() => createContent('### Título\n\nSolo título', ['nuevo-articulo'])).toThrow('descripcion');
+    expect(() => createContent('### Título\n\nSolo título', ['nuevo-articulo'])).toThrow('Descripción');
     expect(() => createContent(form(), ['nuevo-articulo', 'nuevo-trabajo'])).toThrow('único');
   });
 
@@ -306,13 +306,62 @@ describe('publishing safeguards', () => {
   });
 });
 
-test('a rerun of the same issue is safe, but another issue cannot reuse its file', () => {
-  const { saveContent } = require('./content-creator');
-  const body = '### Título\n\nPost\n\n### Descripción\n\nTexto\n\n### Categoría\n\nPatrimonio';
-  const result = createContent(body, ['nuevo-articulo'], { defaultDate: '2026-09-08', issueNumber: 42 });
-  const fs = { writeFileSync: () => { throw Object.assign(new Error(), { code: 'EEXIST' }); }, readFileSync: () => result.content };
-  expect(() => saveContent(result, fs)).not.toThrow();
-  const another = createContent(body, ['nuevo-articulo'], { defaultDate: '2026-09-08', issueNumber: 43 });
-  expect(() => saveContent(another, fs)).toThrow('Ya existe');
-  expect(result.filename).toContain('2026-09-08');
+describe('content owned by an issue', () => {
+  const { saveContent, findIssueFile, FormError } = require('./content-creator');
+  const fs = require('fs');
+  const os = require('os');
+  const path = require('path');
+  const form = (title, text = 'Texto') => `### Título\n\n${title}\n\n### Descripción\n\n${text}\n\n### Categoría\n\nPatrimonio`;
+  const create = (title, issueNumber, text) => createContent(form(title, text), ['nuevo-articulo'], { defaultDate: '2026-09-08', issueNumber });
+  let root;
+  const save = result => saveContent({ ...result, filename: path.join(root, path.relative('content', result.filename)) }, fs, root);
+
+  beforeEach(() => {
+    root = fs.mkdtempSync(path.join(os.tmpdir(), 'content-issue-'));
+    fs.mkdirSync(path.join(root, 'articulos'));
+  });
+  afterEach(() => fs.rmSync(root, { recursive: true, force: true }));
+
+  it('rewrites the same file when the issue is edited, even with a new title', () => {
+    const first = save(create('Post', 42));
+    const second = save(create('Otro título', 42, 'Nuevo texto'));
+    expect(first.updated).toBe(false);
+    expect(second.updated).toBe(true);
+    expect(second.filename).toBe(first.filename);
+    expect(fs.readdirSync(path.join(root, 'articulos'))).toEqual(['2026-09-08-post.md']);
+    expect(fs.readFileSync(first.filename, 'utf8')).toContain('title = "Otro título"');
+  });
+
+  it('keeps the aliases of the existing file', () => {
+    const first = save(create('Post', 42));
+    const aliases = 'aliases = ["/en/articulos/post/"]';
+    fs.writeFileSync(first.filename, fs.readFileSync(first.filename, 'utf8').replace('[extra]', `${aliases}\n[extra]`));
+    const second = save(create('Post', 42, 'Nuevo texto'));
+    expect(second.content).toContain(`${aliases}\n[extra]\nsource_issue = 42\n`);
+    expect(second.content).toContain('description = "Nuevo texto"');
+  });
+
+  it('does not let another issue reuse the file', () => {
+    save(create('Post', 42));
+    expect(() => save(create('Post', 43))).toThrow(FormError);
+    expect(findIssueFile(43, fs, root)).toBeNull();
+  });
+
+  it('refuses to recreate a published issue whose file is gone or predates the marker', () => {
+    const published = createContent(form('Post'), ['nuevo-articulo'], { defaultDate: '2026-09-08', issueNumber: 42, published: true });
+    expect(() => save(published)).toThrow(FormError);
+    expect(fs.readdirSync(path.join(root, 'articulos'))).toEqual([]);
+    save(create('Post', 42));
+    expect(save({ ...published, content: published.content.replace('Texto', 'Nuevo') }).updated).toBe(true);
+  });
+
+  it('ignores a source_issue line in the article body', () => {
+    const file = path.join(root, 'articulos', 'manual.md');
+    fs.writeFileSync(file, '+++\ntitle = "Manual"\n+++\n\nsource_issue = 42\n');
+    expect(findIssueFile(42, fs, root)).toBeNull();
+  });
+
+  it('names the form field in validation errors', () => {
+    expect(() => createContent('### Título\n\nSolo título', ['nuevo-articulo'])).toThrow(new FormError('Falta un campo obligatorio: Descripción'));
+  });
 });
