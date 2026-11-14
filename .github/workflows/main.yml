@@ -35,7 +35,8 @@ jobs:
         uses: actions/checkout@v4.2.2
         with:
           fetch-depth: 0
-          ref: ${{ inputs.revision || github.sha }}
+          # Forms publish in parallel: build the tip of main so a slower run never deploys a site without a newer post.
+          ref: ${{ inputs.revision && 'main' || github.sha }}
 
       - name: Setup Pages
         id: pages
