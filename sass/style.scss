@@ -2294,7 +2294,7 @@ blockquote {
 
     &[href*="localhost"]::after,
     &[href*="127.0.0.1"]::after,
-    .site-footer &[href*="chemaclass.com"]::after {
+    .site-footer &[href*="chemaclass."]::after {
         display: none;
     }
 }
