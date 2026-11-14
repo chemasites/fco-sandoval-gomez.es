@@ -10,7 +10,7 @@ This is a configuration-level evaluation, based on documentation accessed on 8 S
 | Find and edit articles | Collection view with title/date and separate fields | Observe Francisco finding and correcting a paragraph. |
 | Preserve existing URLs | Rename is disabled; filenames remain stable while editing | Change a title and verify the filename does not change. |
 | Upload a cover | Repository media input and public output paths are configurable | Upload a photo, confirm its saved path and deployed responsive variants. |
-| Preserve shortcode syntax | The pilot uses a Markdown code field instead of a rich-text conversion | Save a `media` block and an HTML image, verifying their contents and attributes. |
+| Preserve embed syntax | The pilot uses a Markdown code field instead of a rich-text conversion | Save a `media` block and an HTML image, verifying their contents and attributes. |
 | Keep language files separate | The pilot excludes EN/IT files and section/draft templates | Verify the CMS's actual collection matching behavior before use. |
 | Avoid unintended publication | New entries default to `draft = true` | Verify draft exclusion from pages, search, and feeds. |
 | Protect reviewed translations | Resolved outside the editor on 11 September 2026 | Posts are Spanish-only and no workflow translates content. Nothing overwrites target files. |
@@ -23,7 +23,7 @@ For new files, the filename template uses the chosen article date rather than th
 
 ## Pilot acceptance scenario
 
-Francisco finds a copied Spanish article, corrects a paragraph containing `###` headings, changes a quoted title, retains a `media` shortcode, uploads a replacement cover, and saves it. The generated site displays the complete intended text and cover at the same URL. Other metadata, including the `aliases` for retired English and Italian URLs, and source image originals remain intact. He then creates a draft, verifies that it is absent from the public output, and deliberately publishes it.
+Francisco finds a copied Spanish article, corrects a paragraph containing `###` headings, changes a quoted title, retains a `media` embed, uploads a replacement cover, and saves it. The generated site displays the complete intended text and cover at the same URL. Other metadata, including the `aliases` for retired English and Italian URLs, and source image originals remain intact. He then creates a draft, verifies that it is absent from the public output, and deliberately publishes it.
 
 The first trial excludes rich-text conversion, galleries as editable nested objects, all other content collections, preview hosting, multiple editor roles, and a generator or hosting migration.
 
@@ -32,8 +32,8 @@ The first trial excludes rich-text conversion, galleries as editable nested obje
 1. Use an isolated copy of the repository with production deployment disabled. Copy `pages-pilot.yml` to `.pages.yml` there.
 2. Connect that copy to Pages CMS using an account permitted to edit it. Review the actual repository access requested by the service.
 3. Perform the acceptance scenario with copies of both existing articles, a quoted-title fixture, an image, and a new draft. Inspect the saved files and Git diff, including fields outside the form.
-4. Build using Zola 0.21.0 and run the documented metadata/browser checks. Verify all existing page URLs still resolve.
-5. Record where Francisco needs help, whether the editor changes shortcode syntax, and whether all unchanged fields survive. Adopt it only if it improves the real editing task and passes those checks.
+4. Build using Zola 0.23.6 and run the documented metadata/browser checks. Verify all existing page URLs still resolve.
+5. Record where Francisco needs help, whether the editor changes embed syntax, and whether all unchanged fields survive. Adopt it only if it improves the real editing task and passes those checks.
 
 Before production adoption, verify how CMS-authored commits trigger the existing workflows, and decide how failed saves/deployments are surfaced to the editor. The issue workflow's confirmation comments apply to issue-created content; they are not a status interface for CMS saves.
 

@@ -1,13 +1,28 @@
 {% extends "base.html" %}
 
 {% block content %}
+{% if lang == "en" %}
+{% set hero_title = "Architecture and heritage conservation." %}
+{% set hero_lede = "Life is energy: pure creative energy." %}
+{% elif lang == "it" %}
+{% set hero_title = "Architettura e conservazione del patrimonio." %}
+{% set hero_lede = "La vita è energia: pura energia creativa." %}
+{% else %}
+{% set hero_parts = config.description | split(pat=". ") %}
+{% set hero_title = hero_parts | first ~ "." %}
+{% set hero_lede = hero_parts[1:] | join(sep=". ") %}
+{% endif %}
 <section class="hero">
-    <div class="hero-background">
-        {{ <images.hero_image url="images/sando-homepage.jpeg" alt="" /> }}
-    </div>
-    <div class="hero-content container">
-        <p class="hero-tagline">{% if lang == "en" %}ARCHITECTURE · HERITAGE · REFLECTION{% elif lang == "it" %}ARCHITETTURA · PATRIMONIO · RIFLESSIONE{% else %}ARQUITECTURA · PATRIMONIO · REFLEXIÓN{% endif %}</p>
-        <h1>{% if lang == "en" %}Architecture and heritage conservation. Life is energy: pure creative energy.{% elif lang == "it" %}Architettura e conservazione del patrimonio. La vita è energia: pura energia creativa.{% else %}{{ config.description }}{% endif %}</h1>
+    <div class="container hero-grid">
+        <div class="hero-content">
+            <p class="hero-tagline">{% if lang == "en" %}Architecture · Heritage · Reflection{% elif lang == "it" %}Architettura · Patrimonio · Riflessione{% else %}Arquitectura · Patrimonio · Reflexión{% endif %}</p>
+            <h1>{{ hero_title }}</h1>
+            <p class="hero-lede">{{ hero_lede }}</p>
+        </div>
+        <figure class="hero-background img-skeleton">
+            {{ <images.hero_image url="images/sando-homepage.jpeg" alt="" sizes="(max-width: 768px) 100vw, 440px" /> }}
+            <figcaption>{{ config.extra.i18n[lang].hero_caption }}</figcaption>
+        </figure>
     </div>
 </section>
 
@@ -25,9 +40,9 @@
         {% else %}
         {{ <sections.section_header title="Artículos destacados" link_url="/articulos/" link_text="Ver todos los artículos" /> }}
         {% endif %}
-        <div class="posts-grid posts-grid--cols-{{ articles_count }}">
+        <div class="posts-grid">
             {% for article in (articulos.pages | sort(attribute="date") | reverse)[:articles_count] %}
-                {{ <cards.post_card post={article} /> }}
+                {{ <cards.article_card article={article} i18n={config.extra.i18n} number={loop.index} /> }}
             {% endfor %}
         </div>
     </div>
@@ -47,9 +62,9 @@
         {% else %}
         {{ <sections.section_header title="Trabajos recientes" link_url="/trabajos/" link_text="Ver todos los trabajos" /> }}
         {% endif %}
-        <div class="posts-grid">
+        <div class="trabajos-grid">
             {% for trabajo in trabajos.pages[:2] %}
-                {{ <cards.post_card post={trabajo} /> }}
+                {{ <cards.trabajo_card trabajo={trabajo} /> }}
             {% endfor %}
         </div>
     </div>

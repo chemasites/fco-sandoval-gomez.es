@@ -27,40 +27,14 @@
 </article>
 {% endcomponent cards.post_card %}
 
-{# Blog post card horizontal - used in list views #}
-{% component cards.post_card_horizontal(post) %}
-<article class="post-card post-card--horizontal" lang="{{ post.lang }}">
-    <a href="{{ post.permalink }}">
-        {% if post.extra.image %}
-        <div class="post-image img-skeleton">
-            {{ <images.card_image url={post.extra.image} alt={post.title} /> }}
-        </div>
-        {% endif %}
-        <div class="post-content">
-            <div class="post-meta">
-                {% if post.extra.category %}
-                <span class="category">{{ post.extra.category | upper }}</span>
-                {% endif %}
-                {% if post.date %}
-                <span class="date">{{ post.date | date(format="%d/%m/%Y") }}</span>
-                {% endif %}
-            </div>
-            <h3>{{ post.title }}</h3>
-            {% if post.description %}
-            <p>{{ post.description }}</p>
-            {% endif %}
-        </div>
-    </a>
-</article>
-{% endcomponent cards.post_card_horizontal %}
-
-{# Featured article card - larger card for articulos hero #}
+{# Featured article: first entry on the Artículos page #}
 {% component cards.article_featured(article, i18n) %}
 <article class="article-featured" lang="{{ article.lang }}">
     <a href="{{ article.permalink }}">
+        <span class="article-card__index" aria-hidden="true">01</span>
         {% if article.extra.image %}
         <div class="article-featured__image img-skeleton">
-            {{ <images.card_image url={article.extra.image} alt={article.title} sizes="(max-width: 1024px) 100vw, 60vw" /> }}
+            {{ <images.card_image url={article.extra.image} alt={article.title} sizes="(max-width: 768px) 100vw, 480px" /> }}
         </div>
         {% endif %}
         <div class="article-featured__content">
@@ -79,14 +53,12 @@
 </article>
 {% endcomponent cards.article_featured %}
 
-{# Article card for grid below featured #}
-{% component cards.article_card(article, i18n) %}
+{# Article index row: number, meta, title, summary and thumbnail #}
+{% component cards.article_card(article, i18n, number=0) %}
 <article class="article-card" lang="{{ article.lang }}">
     <a href="{{ article.permalink }}">
-        {% if article.extra.image %}
-        <div class="article-card__image img-skeleton">
-            {{ <images.card_image url={article.extra.image} alt={article.title} /> }}
-        </div>
+        {% if number %}
+        <span class="article-card__index" aria-hidden="true">{% if number < 10 %}0{% endif %}{{ number }}</span>
         {% endif %}
         <div class="article-card__content">
             <div class="post-meta">
@@ -100,6 +72,11 @@
             <p>{{ article.description }}</p>
             {% endif %}
         </div>
+        {% if article.extra.image %}
+        <div class="article-card__image img-skeleton">
+            {{ <images.card_image url={article.extra.image} alt={article.title} sizes="(max-width: 768px) 100vw, 280px" /> }}
+        </div>
+        {% endif %}
     </a>
 </article>
 {% endcomponent cards.article_card %}
@@ -128,9 +105,10 @@
 {% endcomponent cards.trabajo_card %}
 
 {# Investigacion card - academic publication card #}
-{% component cards.investigacion_card(item, i18n) %}
+{% component cards.investigacion_card(item, i18n, year="") %}
 {% set first_link = (item.extra.links or []) | first %}
 <article class="investigacion-card" lang="{{ item.lang }}">
+    <span class="biblio-year">{{ year }}</span>
     <div class="investigacion-card__content">
         <div class="post-meta">
             {% if item.extra.category %}
@@ -173,8 +151,9 @@
 {% endcomponent cards.investigacion_card %}
 
 {# Publicacion externa card - text only list item #}
-{% component cards.publicacion_card(item, i18n) %}
+{% component cards.publicacion_card(item, i18n, year="") %}
 <article class="publicacion-card" lang="{{ item.lang }}">
+    <span class="biblio-year">{{ year }}</span>
     <div class="publicacion-card__content">
         <div class="post-meta">
             {% if item.extra.source %}
@@ -191,22 +170,3 @@
     </div>
 </article>
 {% endcomponent cards.publicacion_card %}
-
-{# Generic content card #}
-{% component cards.content_card(item) %}
-<article class="post-card" lang="{{ item.lang }}">
-    <a href="{{ item.permalink }}">
-        {% if item.extra.image %}
-        <div class="post-image img-skeleton">
-            {{ <images.card_image url={item.extra.image} alt={item.title} /> }}
-        </div>
-        {% endif %}
-        <div class="post-content">
-            <h3>{{ item.title }}</h3>
-            {% if item.description %}
-            <p>{{ item.description }}</p>
-            {% endif %}
-        </div>
-    </a>
-</article>
-{% endcomponent cards.content_card %}
