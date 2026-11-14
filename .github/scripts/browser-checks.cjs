@@ -100,8 +100,24 @@ const server = http.createServer((req, res) => {
     await errorPage.locator('.search-toggle').click();
     await errorPage.waitForFunction(() => document.querySelector('#search-status').textContent.includes('No se pudo'));
 
-    await page.goto(origin + '/publicaciones/', { waitUntil: 'networkidle' });
-    assert((await page.locator('.pagination').textContent()).includes('Siguiente'));
+    // Publications are grouped by year on one page, newest first, with a year index.
+    await phone.goto(origin + '/publicaciones/', { waitUntil: 'networkidle' });
+    assert.equal(await phone.locator('.pagination').count(), 0);
+    const years = await phone.locator('.year-group h2').allTextContents();
+    assert(years.length > 1);
+    assert.deepEqual(years, [...years].sort().reverse(), 'Year headings run newest first');
+    assert.deepEqual(await phone.locator('.year-nav a').allTextContents(), years);
+    const oldest = years.at(-1);
+    await phone.locator(`.year-nav a[href="#year-${oldest}"]`).click();
+    await phone.waitForFunction(id => location.hash === '#' + id, `year-${oldest}`);
+    const heading = phone.locator(`#year-${oldest}`);
+    assert(await heading.evaluate(el => { const top = el.getBoundingClientRect().top; return top >= 0 && top < innerHeight; }), 'Year link scrolls to its heading');
+    const source = heading.locator('xpath=..').locator('.publicacion-card').first();
+    assert((await source.locator('.category').textContent()).trim().length > 0, 'Each entry shows its source');
+    assert.equal(await source.locator('h3 a').getAttribute('target'), '_blank');
+    assert.equal(await phone.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
+    await page.goto(origin + '/publicaciones/page/2/');
+    await page.waitForURL(url => url.pathname === '/publicaciones/');
 
     // Posts are Spanish-only: EN/IT sections list them, old post URLs redirect,
     // and search uses the Spanish index. Static pages and the 404 stay localized.
@@ -112,6 +128,8 @@ const server = http.createServer((req, res) => {
       await page.goto(origin + '/' + locale + '/publicaciones/', { waitUntil: 'networkidle' });
       assert.equal(await page.locator('.pagination').count(), 0, 'Localized sections list every post on one page');
       assert(await page.locator('.publicacion-card').count() > 15);
+      assert(await page.locator('.year-group h2').count() > 1);
+      assert.equal(await page.locator('.year-nav').getAttribute('aria-label'), locale === 'en' ? 'Jump to year' : "Vai all'anno");
       assert.equal(await page.locator('.publicacion-card:not([lang="es"])').count(), 0);
       assert.equal((await page.locator('.language-note').textContent()).trim(), note);
       await page.goto(origin + '/' + locale + '/articulos/', { waitUntil: 'networkidle' });
