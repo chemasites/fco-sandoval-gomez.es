@@ -1,7 +1,5 @@
 {% extends "base.html" %}
 
-{% import "macros/sections.html" as sections %}
-
 {% block title %}{{ page.title }} | Francisco Sandoval Gómez{% endblock %}
 
 {% block content %}
@@ -12,7 +10,7 @@
                 <img src="{{ get_url(path='images/sando-avatar.jpg') }}" alt="Francisco Sandoval Gómez">
             </div>
             <div class="sobre-mi-intro">
-                {{ sections::page_header_styled(title=page.title, description=page.description | default(value="")) }}
+                {{ <sections.page_header_styled title={page.title} description={page.description or ""} /> }}
             </div>
         </div>
         <div class="prose">

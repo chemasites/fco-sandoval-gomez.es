@@ -7,10 +7,13 @@ alwaysApply: false
 
 Templates:
 
-- Pages extend `templates/base.html`. Reusable pieces go in `partials/` and `macros/`; snippets embedded in content go in `shortcodes/`.
+- Pages extend `templates/base.html`. Reusable pieces go in `partials/` and Tera 2 components in `components/` (called as `{{ <cards.post_card post={page} /> }}`, no import).
+- Components only see their parameters. Pass `config` data in explicitly, such as `i18n={config.extra.i18n}`.
+- Content embeds `gallery`, `media` and `youtube` (`{% <media align="left"> %}...{% </media> %}`). Wrap their output in `compact`: Markdown parses component output again.
+- `default(value=...)` does not replace `null`. Use `a or b` for optional page fields.
 - Read user-facing text from `config.extra.i18n`, never hardcode it.
 - Links respect the current `lang` (ES `/`, EN `/en/`, IT `/it/`).
-- EN/IT listings read the Spanish section (`get_section` without `lang`); cards carry the post's `lang` attribute.
+- EN/IT listings read the Spanish section (`get_section` with `lang=config.default_language`); cards carry the post's `lang` attribute.
 
 Styles:
 

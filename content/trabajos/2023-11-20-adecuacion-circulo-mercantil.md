@@ -22,12 +22,12 @@ En primer lugar, se redactó un estudio previo del edificio consta de un guión 
 
 Entre los principales retos del proyecto se encontraban generar dos salas de celebraciones en planta primera que conciliasen la diversidad de actos que el inmueble pueda acoger y responda a la naturaleza intergeneracional de sus usuarios o crear aseos para personas con movilidad reducida en un intrincado espacio que hasta el momento carece de ellos.
 
-{% gallery(id="bocetos") %}
+{% <gallery id="bocetos"> %}
 images/trabajos/circulo-mercantil/sandot2-1.jpeg
 images/trabajos/circulo-mercantil/sandot2-2.jpeg
 images/trabajos/circulo-mercantil/sandot2-3.jpeg
 images/trabajos/circulo-mercantil/sandot2-4.jpeg
 images/trabajos/circulo-mercantil/sandot2-5.jpeg
-{% end %}
+{% </gallery> %}
 
-{{ youtube(id="rP7ra6pPsag") }}
+{{ <youtube id="rP7ra6pPsag" /> }}

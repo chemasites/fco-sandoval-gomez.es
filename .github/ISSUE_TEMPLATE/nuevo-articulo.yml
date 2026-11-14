@@ -64,27 +64,28 @@ body:
         El contenido completo del artículo. Puedes usar Markdown (## para títulos, **negrita**, *cursiva*, etc.)
 
         **Imagen con texto:** Para alinear una imagen junto a texto, usa:
-        - `{% media(align="left") %}` - imagen a la izquierda, texto a la derecha
-        - `{% media(align="right") %}` - imagen a la derecha, texto a la izquierda
+        - `{% <media align="left"> %}` - imagen a la izquierda, texto a la derecha
+        - `{% <media align="right"> %}` - imagen a la derecha, texto a la izquierda
+        - Cierra siempre el bloque con `{% </media> %}`
 
         Ejemplo:
         ```
-        {% media(align="left") %}
+        {% <media align="left"> %}
         ![](url-imagen.jpg)
 
         Texto que aparece junto a la imagen.
-        {% end %}
+        {% </media> %}
         ```
       placeholder: |
         ## Primera sección
 
         Escribe aquí el contenido...
 
-        {% media(align="left") %}
+        {% <media align="left"> %}
         ![](arrastra-imagen-aqui.jpg)
 
         Texto que aparece a la derecha de la imagen.
-        {% end %}
+        {% </media> %}
 
         ## Segunda sección
 

@@ -1,15 +1,17 @@
-{% import "macros/images.html" as images %}
-{% set gallery_id = id | default(value="gallery-" ~ range(end=9999) | first) %}
+{% component gallery(id="gallery") %}
+{% <compact> %}
 {% set image_list = body | trim | split(pat="
 ") %}
-<div class="gallery" data-gallery-id="{{ gallery_id }}">
+<div class="gallery" data-gallery-id="{{ id }}">
     <div class="gallery-grid">
         {% for img_path in image_list %}
         {% if img_path | trim != "" %}
         <figure class="gallery-item img-skeleton" data-index="{{ loop.index0 }}">
-            {{ images::gallery_image(url=img_path | trim, alt="") }}
+            {{ <images.gallery_image url={img_path | trim} alt="" /> }}
         </figure>
         {% endif %}
         {% endfor %}
     </div>
 </div>
+{% </compact> %}
+{% endcomponent gallery %}

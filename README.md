@@ -6,7 +6,7 @@ Portfolio personal de arquitectura y conservación del patrimonio.
 
 ### Prerequisites
 
-- [Zola](https://www.getzola.org/documentation/getting-started/installation/) (0.21.0 or higher)
+- [Zola](https://www.getzola.org/documentation/getting-started/installation/) (0.23.6 or higher)
 
 ### Getting Started
 
@@ -36,7 +36,7 @@ Posts published before September 2026 keep `aliases` for their old `/en/` and
 
 ### Checks
 
-Use Zola 0.21.0 to match CI. From the repository root:
+Use Zola 0.23.6 to match CI. From the repository root:
 
 ```bash
 npm ci --prefix .github/scripts

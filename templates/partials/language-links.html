@@ -13,7 +13,7 @@
 {% endif %}
 {% for language_code in ["es", "en", "it"] %}
 {% for translation in available_languages %}
-{% set translation_lang = translation.lang | default(value=config.default_language) %}
+{% set translation_lang = translation.lang or config.default_language %}
 {% if translation_lang == language_code %}
 {% set href = translation.permalink %}
 {% if translation_lang == lang and page %}{% set href = page.permalink %}{% endif %}

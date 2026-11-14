@@ -1,13 +1,9 @@
 {% extends "base.html" %}
 
-{% import "macros/cards.html" as cards %}
-{% import "macros/images.html" as images %}
-{% import "macros/sections.html" as sections %}
-
 {% block content %}
 <section class="hero">
     <div class="hero-background">
-        {{ images::hero_image(url="images/sando-homepage.jpeg", alt="") }}
+        {{ <images.hero_image url="images/sando-homepage.jpeg" alt="" /> }}
     </div>
     <div class="hero-content container">
         <p class="hero-tagline">{% if lang == "en" %}ARCHITECTURE · HERITAGE · REFLECTION{% elif lang == "it" %}ARCHITETTURA · PATRIMONIO · RIFLESSIONE{% else %}ARQUITECTURA · PATRIMONIO · REFLEXIÓN{% endif %}</p>
@@ -16,44 +12,44 @@
 </section>
 
 {# Posts are published in Spanish only, so every locale lists them. #}
-{% set articulos = get_section(path="articulos/_index.md") %}
+{% set articulos = get_section(path="articulos/_index.md", lang=config.default_language) %}
 {% if articulos.pages | length > 0 %}
 {% set articles_count = articulos.pages | length %}
 {% if articles_count > 4 %}{% set articles_count = 4 %}{% endif %}
 <section class="articles-section">
     <div class="container">
         {% if lang == "en" %}
-        {{ sections::section_header(title="Featured Articles", link_url="/en/articulos/", link_text="View all articles") }}
+        {{ <sections.section_header title="Featured Articles" link_url="/en/articulos/" link_text="View all articles" /> }}
         {% elif lang == "it" %}
-        {{ sections::section_header(title="Articoli in evidenza", link_url="/it/articulos/", link_text="Vedi tutti gli articoli") }}
+        {{ <sections.section_header title="Articoli in evidenza" link_url="/it/articulos/" link_text="Vedi tutti gli articoli" /> }}
         {% else %}
-        {{ sections::section_header(title="Artículos destacados", link_url="/articulos/", link_text="Ver todos los artículos") }}
+        {{ <sections.section_header title="Artículos destacados" link_url="/articulos/" link_text="Ver todos los artículos" /> }}
         {% endif %}
         <div class="posts-grid posts-grid--cols-{{ articles_count }}">
-            {% for article in articulos.pages | sort(attribute="date") | reverse | slice(end=articles_count) %}
-                {{ cards::post_card(post=article) }}
+            {% for article in (articulos.pages | sort(attribute="date") | reverse)[:articles_count] %}
+                {{ <cards.post_card post={article} /> }}
             {% endfor %}
         </div>
     </div>
 </section>
 {% endif %}
 
-{{ sections::quote(text=config.extra.i18n[lang].quote_text, author=config.extra.quote.author) }}
+{{ <sections.quote text={config.extra.i18n[lang].quote_text} author={config.extra.quote.author} /> }}
 
-{% set trabajos = get_section(path="trabajos/_index.md") %}
+{% set trabajos = get_section(path="trabajos/_index.md", lang=config.default_language) %}
 {% if trabajos.pages | length > 0 %}
 <section class="trabajos-section">
     <div class="container">
         {% if lang == "en" %}
-        {{ sections::section_header(title="Recent Works", link_url="/en/trabajos/", link_text="View all works") }}
+        {{ <sections.section_header title="Recent Works" link_url="/en/trabajos/" link_text="View all works" /> }}
         {% elif lang == "it" %}
-        {{ sections::section_header(title="Lavori recenti", link_url="/it/trabajos/", link_text="Vedi tutti i lavori") }}
+        {{ <sections.section_header title="Lavori recenti" link_url="/it/trabajos/" link_text="Vedi tutti i lavori" /> }}
         {% else %}
-        {{ sections::section_header(title="Trabajos recientes", link_url="/trabajos/", link_text="Ver todos los trabajos") }}
+        {{ <sections.section_header title="Trabajos recientes" link_url="/trabajos/" link_text="Ver todos los trabajos" /> }}
         {% endif %}
         <div class="posts-grid">
-            {% for trabajo in trabajos.pages | slice(end=2) %}
-                {{ cards::post_card(post=trabajo) }}
+            {% for trabajo in trabajos.pages[:2] %}
+                {{ <cards.post_card post={trabajo} /> }}
             {% endfor %}
         </div>
     </div>

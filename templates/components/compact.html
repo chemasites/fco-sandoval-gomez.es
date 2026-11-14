@@ -1,0 +1,4 @@
+{# Component output inside Markdown is parsed again: a blank or indented line would turn the HTML into a code block. #}
+{% component compact() %}{{ [line | trim for line in body | split(pat="
+") if line | trim != ""] | join(sep="
+") | safe }}{% endcomponent compact %}

@@ -1,15 +1,12 @@
-{% import "macros/dates.html" as dates %}
-{% import "macros/images.html" as images %}
-
 {# Cards declare their content language: EN/IT listings show Spanish-only posts. #}
 
 {# Blog post card - used in grids on homepage #}
-{% macro post_card(post) %}
+{% component cards.post_card(post) %}
 <article class="post-card" lang="{{ post.lang }}">
     <a href="{{ post.permalink }}">
         {% if post.extra.image %}
         <div class="post-image img-skeleton">
-            {{ images::card_image(url=post.extra.image, alt=post.title) }}
+            {{ <images.card_image url={post.extra.image} alt={post.title} /> }}
         </div>
         {% endif %}
         <div class="post-content">
@@ -28,15 +25,15 @@
         </div>
     </a>
 </article>
-{% endmacro %}
+{% endcomponent cards.post_card %}
 
 {# Blog post card horizontal - used in list views #}
-{% macro post_card_horizontal(post) %}
+{% component cards.post_card_horizontal(post) %}
 <article class="post-card post-card--horizontal" lang="{{ post.lang }}">
     <a href="{{ post.permalink }}">
         {% if post.extra.image %}
         <div class="post-image img-skeleton">
-            {{ images::card_image(url=post.extra.image, alt=post.title) }}
+            {{ <images.card_image url={post.extra.image} alt={post.title} /> }}
         </div>
         {% endif %}
         <div class="post-content">
@@ -55,15 +52,15 @@
         </div>
     </a>
 </article>
-{% endmacro %}
+{% endcomponent cards.post_card_horizontal %}
 
 {# Featured article card - larger card for articulos hero #}
-{% macro article_featured(article) %}
+{% component cards.article_featured(article, i18n) %}
 <article class="article-featured" lang="{{ article.lang }}">
     <a href="{{ article.permalink }}">
         {% if article.extra.image %}
         <div class="article-featured__image img-skeleton">
-            {{ images::card_image(url=article.extra.image, alt=article.title, sizes="(max-width: 1024px) 100vw, 60vw") }}
+            {{ <images.card_image url={article.extra.image} alt={article.title} sizes="(max-width: 1024px) 100vw, 60vw" /> }}
         </div>
         {% endif %}
         <div class="article-featured__content">
@@ -71,7 +68,7 @@
                 {% if article.extra.category %}
                 <span class="category">{{ article.extra.category | upper }}</span>
                 {% endif %}
-                <span class="date">{{ dates::fecha_completa(date=article.date, lang=article.lang) }}</span>
+                <span class="date">{{ <dates.fecha_completa date={article.date} lang={article.lang} months={i18n[article.lang].months} /> }}</span>
             </div>
             <h2>{{ article.title }}</h2>
             {% if article.description %}
@@ -80,15 +77,15 @@
         </div>
     </a>
 </article>
-{% endmacro %}
+{% endcomponent cards.article_featured %}
 
 {# Article card for grid below featured #}
-{% macro article_card(article) %}
+{% component cards.article_card(article, i18n) %}
 <article class="article-card" lang="{{ article.lang }}">
     <a href="{{ article.permalink }}">
         {% if article.extra.image %}
         <div class="article-card__image img-skeleton">
-            {{ images::card_image(url=article.extra.image, alt=article.title) }}
+            {{ <images.card_image url={article.extra.image} alt={article.title} /> }}
         </div>
         {% endif %}
         <div class="article-card__content">
@@ -96,7 +93,7 @@
                 {% if article.extra.category %}
                 <span class="category">{{ article.extra.category | upper }}</span>
                 {% endif %}
-                <span class="date">{{ dates::fecha_completa(date=article.date, lang=article.lang) }}</span>
+                <span class="date">{{ <dates.fecha_completa date={article.date} lang={article.lang} months={i18n[article.lang].months} /> }}</span>
             </div>
             <h3>{{ article.title }}</h3>
             {% if article.description %}
@@ -105,15 +102,15 @@
         </div>
     </a>
 </article>
-{% endmacro %}
+{% endcomponent cards.article_card %}
 
 {# Trabajo card - grid style with large image #}
-{% macro trabajo_card(trabajo) %}
+{% component cards.trabajo_card(trabajo) %}
 <article class="trabajo-card" lang="{{ trabajo.lang }}">
     <a href="{{ trabajo.permalink }}">
         {% if trabajo.extra.image %}
         <div class="trabajo-card__image img-skeleton">
-            {{ images::card_image(url=trabajo.extra.image, alt=trabajo.title) }}
+            {{ <images.card_image url={trabajo.extra.image} alt={trabajo.title} /> }}
         </div>
         {% endif %}
         <div class="trabajo-card__content">
@@ -128,11 +125,11 @@
         </div>
     </a>
 </article>
-{% endmacro %}
+{% endcomponent cards.trabajo_card %}
 
 {# Investigacion card - academic publication card #}
-{% macro investigacion_card(item) %}
-{% set first_link = item.extra.links | default(value=[]) | first %}
+{% component cards.investigacion_card(item, i18n) %}
+{% set first_link = (item.extra.links or []) | first %}
 <article class="investigacion-card" lang="{{ item.lang }}">
     <div class="investigacion-card__content">
         <div class="post-meta">
@@ -140,7 +137,7 @@
             <span class="category">{{ item.extra.category | upper }}</span>
             {% endif %}
             {% if item.date %}
-            <span class="date">{{ dates::fecha_mes_ano(date=item.date, lang=item.lang) }}</span>
+            <span class="date">{{ <dates.fecha_mes_ano date={item.date} months={i18n[item.lang].months} /> }}</span>
             {% endif %}
         </div>
         <h3>
@@ -157,7 +154,7 @@
         <p class="investigacion-card__original-title">{{ item.extra.original_title }}</p>
         {% endif %}
         {% if item.extra.coauthors %}
-        <p class="investigacion-card__coauthors">{{ config.extra.i18n[item.lang].coauthors_label }} {{ item.extra.coauthors }}</p>
+        <p class="investigacion-card__coauthors">{{ i18n[item.lang].coauthors_label }} {{ item.extra.coauthors }}</p>
         {% endif %}
         {% if item.description %}
         <p class="investigacion-card__description">{{ item.description }}</p>
@@ -173,10 +170,10 @@
         {% endif %}
     </div>
 </article>
-{% endmacro %}
+{% endcomponent cards.investigacion_card %}
 
 {# Publicacion externa card - text only list item #}
-{% macro publicacion_card(item) %}
+{% component cards.publicacion_card(item, i18n) %}
 <article class="publicacion-card" lang="{{ item.lang }}">
     <div class="publicacion-card__content">
         <div class="post-meta">
@@ -184,7 +181,7 @@
             <span class="category">{{ item.extra.source }}</span>
             {% endif %}
             {% if item.date %}
-            <span class="date">{{ dates::fecha_mes_ano(date=item.date, lang=item.lang) }}</span>
+            <span class="date">{{ <dates.fecha_mes_ano date={item.date} months={i18n[item.lang].months} /> }}</span>
             {% endif %}
         </div>
         <h3>{% if item.extra.url %}<a href="{{ item.extra.url }}" target="_blank" rel="noopener">{{ item.title }} <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/></svg></a>{% else %}{{ item.title }}{% endif %}</h3>
@@ -193,15 +190,15 @@
         {% endif %}
     </div>
 </article>
-{% endmacro %}
+{% endcomponent cards.publicacion_card %}
 
 {# Generic content card #}
-{% macro content_card(item) %}
+{% component cards.content_card(item) %}
 <article class="post-card" lang="{{ item.lang }}">
     <a href="{{ item.permalink }}">
         {% if item.extra.image %}
         <div class="post-image img-skeleton">
-            {{ images::card_image(url=item.extra.image, alt=item.title) }}
+            {{ <images.card_image url={item.extra.image} alt={item.title} /> }}
         </div>
         {% endif %}
         <div class="post-content">
@@ -212,4 +209,4 @@
         </div>
     </a>
 </article>
-{% endmacro %}
+{% endcomponent cards.content_card %}

@@ -1,11 +1,11 @@
-{% macro section_header(title, link_url, link_text) %}
+{% component sections.section_header(title, link_url, link_text) %}
 <div class="section-header">
     <h2>{{ title }}</h2>
     <a href="{{ link_url }}" class="view-all">{{ link_text }} <span class="arrow">→</span></a>
 </div>
-{% endmacro %}
+{% endcomponent sections.section_header %}
 
-{% macro quote(text, author) %}
+{% component sections.quote(text, author) %}
 <section class="quote-section">
     <div class="container">
         <blockquote>
@@ -14,9 +14,9 @@
         </blockquote>
     </div>
 </section>
-{% endmacro %}
+{% endcomponent sections.quote %}
 
-{% macro page_header(title, description="", note="") %}
+{% component sections.page_header(title, description="", note="") %}
 <section class="page-header">
     <div class="container">
         <h1>{{ title }}</h1>
@@ -28,9 +28,9 @@
         {% endif %}
     </div>
 </section>
-{% endmacro %}
+{% endcomponent sections.page_header %}
 
-{% macro page_header_styled(title, description="", note="") %}
+{% component sections.page_header_styled(title, description="", note="") %}
 <div class="page-header-styled">
     <h1>{{ title }}</h1>
     {% if description %}
@@ -40,4 +40,4 @@
     <p class="language-note">{{ note }}</p>
     {% endif %}
 </div>
-{% endmacro %}
+{% endcomponent sections.page_header_styled %}

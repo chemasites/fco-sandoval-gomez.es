@@ -1,12 +1,11 @@
 {% extends "base.html" %}
-{% import "macros/sections.html" as sections %}
 
 {% block title %}{{ config.extra.i18n[lang].contact_title }} | Francisco Sandoval Gómez{% endblock %}
 
 {% block content %}
 <section class="contact-page">
     <div class="container">
-        {{ sections::page_header_styled(title=config.extra.i18n[lang].contact_title, description=config.extra.i18n[lang].contact_description) }}
+        {{ <sections.page_header_styled title={config.extra.i18n[lang].contact_title} description={config.extra.i18n[lang].contact_description} /> }}
 
         <div class="contact-content">
             <div class="contact-main">
