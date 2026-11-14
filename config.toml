@@ -169,3 +169,7 @@ footer_dev = "Sviluppato da"
 search_placeholder = "Cerca..."
 search_no_results = "Nessun risultato trovato"
 spanish_only_note = "Questi contenuti sono pubblicati in spagnolo."
+
+# The site answers automated requests with 406 Not Acceptable.
+[link_checker]
+skip_prefixes = ["https://www.laopiniondemurcia.es/"]
