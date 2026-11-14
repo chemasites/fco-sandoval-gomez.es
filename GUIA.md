@@ -108,10 +108,7 @@ Cuando rellenas el formulario, simplemente **arrastra la imagen** al campo "Imag
 
 Tambien puedes copiar una imagen y pegarla (Ctrl+V o Cmd+V) en el campo de imagen.
 
-**Recomendaciones:**
-- Formato: JPG o PNG
-- Tamano maximo: 1MB
-- Resolucion recomendada: 1200px de ancho
+Sirve cualquier foto en JPG, PNG o WebP. La web guarda una copia reducida a 1600px de ancho, no hace falta reducirla antes.
 
 ---
 

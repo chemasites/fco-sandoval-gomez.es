@@ -88,6 +88,22 @@ jobs:
               body: receivedStatus({ edited: context.payload.action === 'edited' }),
             });
 
+      # Without the resizer the post still publishes, with its images left on GitHub.
+      - name: Setup Node
+        if: steps.auth.outputs.authorized == 'true'
+        continue-on-error: true
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: .github/scripts/package-lock.json
+
+      - name: Install the image resizer
+        if: steps.auth.outputs.authorized == 'true'
+        continue-on-error: true
+        run: npm ci --omit=dev
+        working-directory: .github/scripts
+
       - name: Parse issue and create content
         id: create
         if: steps.auth.outputs.authorized == 'true'
@@ -95,6 +111,7 @@ jobs:
         with:
           script: |
             const { createContent, saveContent, FormError } = require('./.github/scripts/content-creator.js');
+            const { localizeImages } = require('./.github/scripts/content-images.js');
 
             const { data: issue } = await github.rest.issues.get({ ...context.repo, issue_number: context.issue.number });
             const labels = issue.labels.map(l => l.name);
@@ -110,6 +127,7 @@ jobs:
               if (error instanceof FormError) core.setOutput('form_error', error.message);
               throw error;
             }
+            result = await localizeImages(result);
             console.log(`${result.updated ? 'Updated' : 'Created'}: ${result.filename}`);
 
             core.setOutput('updated', result.updated);
@@ -134,7 +152,7 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add content/
+          git add content/ static/images/
           if git diff --staged --quiet; then
             echo "No changes to commit"
             echo "has_changes=false" >> "$GITHUB_OUTPUT"
