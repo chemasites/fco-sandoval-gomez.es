@@ -44,7 +44,7 @@ const server = http.createServer((req, res) => {
     await page.goto(origin, { waitUntil: 'networkidle' });
     assert.equal(indexes, 0, 'Search index must not download until search opens');
     await page.keyboard.press('d');
-    assert.equal(await page.locator('html').evaluate(el => el.classList.contains('theme-dark')), false, 'Single-letter shortcuts default to disabled');
+    assert.equal(await page.locator('html').evaluate(el => el.classList.contains('theme-dark')), false, 'Single-letter keys must not change the page');
     await page.locator('.search-toggle').click();
     await page.locator('#search-input').fill('caravaca');
     await page.waitForFunction(() => document.querySelectorAll('.search-result-item').length > 1);
@@ -59,13 +59,6 @@ const server = http.createServer((req, res) => {
     await page.waitForFunction(() => document.querySelector('.search-result-title')?.textContent.toLowerCase().includes('acústica'));
     assert.equal(indexes, 1, 'Reopening search reuses its index');
     await page.keyboard.press('Escape');
-    await page.locator('.help-toggle').click();
-    assert(await page.locator('#help-modal').evaluate(el => el.open));
-    await page.locator('#enable-shortcuts').check();
-    await page.keyboard.press('Escape');
-    assert(await page.locator('.help-toggle').evaluate(el => el === document.activeElement));
-    await page.keyboard.press('d');
-    assert(await page.locator('html').evaluate(el => el.classList.contains('theme-dark')));
 
     await page.goto(origin + '/articulos/arquitectura-pluribus/', { waitUntil: 'networkidle' });
     const imageButton = page.locator('.image-trigger').first();
@@ -162,6 +155,6 @@ const server = http.createServer((req, res) => {
       await page.screenshot({ path: path.join(process.env.SCREENSHOT_DIR, 'desktop-dark.png'), fullPage: true });
     }
     assert.deepEqual(errors, [], 'No uncaught browser errors');
-    console.log('Browser checks passed: search, dialogs, shortcuts, mobile, responsive images, no-JS images, loading failure, Spanish-only posts in EN/IT, retired post URLs and 404.');
+    console.log('Browser checks passed: search, dialogs, mobile, responsive images, no-JS images, loading failure, Spanish-only posts in EN/IT, retired post URLs and 404.');
   } finally { await browser.close(); }
 })().catch(error => { console.error(error); process.exitCode = 1; }).finally(() => server.close());

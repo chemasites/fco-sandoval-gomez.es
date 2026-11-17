@@ -1,27 +1,18 @@
 {% extends "base.html" %}
 
 {% block content %}
-{% if lang == "en" %}
-{% set hero_title = "Architecture and heritage conservation." %}
-{% set hero_lede = "Life is energy: pure creative energy." %}
-{% elif lang == "it" %}
-{% set hero_title = "Architettura e conservazione del patrimonio." %}
-{% set hero_lede = "La vita è energia: pura energia creativa." %}
-{% else %}
-{% set hero_parts = config.description | split(pat=". ") %}
-{% set hero_title = hero_parts | first ~ "." %}
-{% set hero_lede = hero_parts[1:] | join(sep=". ") %}
-{% endif %}
+{% set i18n = config.extra.i18n[lang] %}
+{% if lang == config.default_language %}{% set lang_prefix = "/" %}{% else %}{% set lang_prefix = "/" ~ lang ~ "/" %}{% endif %}
 <section class="hero">
     <div class="container hero-grid">
         <div class="hero-content">
-            <p class="hero-tagline">{% if lang == "en" %}Architecture · Heritage · Reflection{% elif lang == "it" %}Architettura · Patrimonio · Riflessione{% else %}Arquitectura · Patrimonio · Reflexión{% endif %}</p>
-            <h1>{{ hero_title }}</h1>
-            <p class="hero-lede">{{ hero_lede }}</p>
+            <p class="hero-tagline">{{ i18n.hero_tagline }}</p>
+            <h1>{{ i18n.hero_title }}</h1>
+            <p class="hero-lede">{{ i18n.hero_lede }}</p>
         </div>
         <figure class="hero-background img-skeleton">
             {{ <images.hero_image url="images/sando-homepage.jpeg" alt="" sizes="(max-width: 768px) 100vw, (max-width: 1421px) 38vw, 540px" /> }}
-            <figcaption>{{ config.extra.i18n[lang].hero_caption }}</figcaption>
+            <figcaption>{{ i18n.hero_caption }}</figcaption>
         </figure>
     </div>
 </section>
@@ -29,19 +20,11 @@
 {# Posts are published in Spanish only, so every locale lists them. #}
 {% set articulos = get_section(path="articulos/_index.md", lang=config.default_language) %}
 {% if articulos.pages | length > 0 %}
-{% set articles_count = articulos.pages | length %}
-{% if articles_count > 4 %}{% set articles_count = 4 %}{% endif %}
 <section class="articles-section">
     <div class="container">
-        {% if lang == "en" %}
-        {{ <sections.section_header title="Featured Articles" link_url="/en/articulos/" link_text="View all articles" /> }}
-        {% elif lang == "it" %}
-        {{ <sections.section_header title="Articoli in evidenza" link_url="/it/articulos/" link_text="Vedi tutti gli articoli" /> }}
-        {% else %}
-        {{ <sections.section_header title="Artículos destacados" link_url="/articulos/" link_text="Ver todos los artículos" /> }}
-        {% endif %}
+        {{ <sections.section_header title={i18n.home_articles_title} link_url={lang_prefix ~ "articulos/"} link_text={i18n.home_articles_link} /> }}
         <div class="posts-grid">
-            {% for article in (articulos.pages | sort(attribute="date") | reverse)[:articles_count] %}
+            {% for article in articulos.pages[:3] %}
                 {{ <cards.article_card article={article} i18n={config.extra.i18n} number={loop.index} /> }}
             {% endfor %}
         </div>
@@ -49,19 +32,11 @@
 </section>
 {% endif %}
 
-{{ <sections.quote text={config.extra.i18n[lang].quote_text} author={config.extra.quote.author} /> }}
-
 {% set trabajos = get_section(path="trabajos/_index.md", lang=config.default_language) %}
 {% if trabajos.pages | length > 0 %}
 <section class="trabajos-section">
     <div class="container">
-        {% if lang == "en" %}
-        {{ <sections.section_header title="Recent Works" link_url="/en/trabajos/" link_text="View all works" /> }}
-        {% elif lang == "it" %}
-        {{ <sections.section_header title="Lavori recenti" link_url="/it/trabajos/" link_text="Vedi tutti i lavori" /> }}
-        {% else %}
-        {{ <sections.section_header title="Trabajos recientes" link_url="/trabajos/" link_text="Ver todos los trabajos" /> }}
-        {% endif %}
+        {{ <sections.section_header title={i18n.home_works_title} link_url={lang_prefix ~ "trabajos/"} link_text={i18n.home_works_link} /> }}
         <div class="trabajos-grid">
             {% for trabajo in trabajos.pages[:2] %}
                 {{ <cards.trabajo_card trabajo={trabajo} /> }}
@@ -70,4 +45,31 @@
     </div>
 </section>
 {% endif %}
+
+{{ <sections.quote text={i18n.quote_text} author={config.extra.quote.author} /> }}
+
+{% set investigacion = get_section(path="investigacion/_index.md", lang=config.default_language) %}
+{% set publicaciones = get_section(path="publicaciones/_index.md", lang=config.default_language) %}
+<section class="scholarship-section">
+    <div class="container scholarship-grid">
+        <div class="scholarship-column">
+            {{ <sections.section_header title={i18n.nav_investigacion} link_url={lang_prefix ~ "investigacion/"} link_text={i18n.home_research_link} /> }}
+            <ol class="index-list">
+                {% for item in investigacion.pages[:4] %}
+                {% set links = item.extra.links or [] %}
+                {{ <cards.index_row title={item.title} url={links[0].url if links else item.permalink} external={links | length > 0} label={item.extra.category or ""} year={item.date | date(format="%Y")} lang={item.lang} /> }}
+                {% endfor %}
+            </ol>
+        </div>
+        <div class="scholarship-column">
+            {{ <sections.section_header title={i18n.home_publications_title} link_url={lang_prefix ~ "publicaciones/"} link_text={i18n.home_publications_link} /> }}
+            <ol class="index-list">
+                {% for item in publicaciones.pages[:4] %}
+                {% if item.extra.url %}{% set external = true %}{% else %}{% set external = false %}{% endif %}
+                {{ <cards.index_row title={item.title} url={item.extra.url or item.permalink} external={external} label={item.extra.source or ""} year={item.date | date(format="%Y")} lang={item.lang} /> }}
+                {% endfor %}
+            </ol>
+        </div>
+    </div>
+</section>
 {% endblock %}

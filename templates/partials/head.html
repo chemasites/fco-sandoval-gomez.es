@@ -87,33 +87,7 @@
 <meta property="article:author" content="{{ config.extra.author }}">
 {% endif %}
 
-{# Critical CSS inline for faster first paint #}
-<style>
-@font-face{font-family:'Inter';font-style:normal;font-weight:400;font-display:swap;src:url('/fonts/inter-v20-latin-regular.woff2') format('woff2')}
-@font-face{font-family:'Newsreader';font-style:normal;font-weight:300;font-display:swap;src:url('/fonts/newsreader-v26-latin-300.woff2') format('woff2')}
-:root{--color-primary:#1f2328;--color-primary-light:#62676b;--color-accent:#2f6f64;--color-accent-light:#23564d;--color-bg:#f3f1ec;--color-bg-light:#faf9f6;--color-text:#1f2328;--color-text-light:#62676b;--color-border:#d9d5cc;--color-shadow:rgb(31 35 40/10%)}
-.theme-dark{--color-primary:#ece9e2;--color-primary-light:#a3a8ac;--color-accent:#8cc2b6;--color-accent-light:#b3d9d0;--color-bg:#16191c;--color-bg-light:#1e2226;--color-text:#ece9e2;--color-text-light:#a3a8ac;--color-border:#343a40;--color-shadow:rgb(0 0 0/35%)}
-*,*::before,*::after{box-sizing:border-box}
-html{font-size:16px}
-body{margin:0;padding:0;font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;font-size:1.0625rem;line-height:1.65;color:var(--color-text);background-color:var(--color-bg)}
-img{max-width:100%;height:auto;display:block}
-a{color:inherit;text-decoration:none}
-h1,h2,h3,h4,h5,h6{font-family:'Newsreader',Georgia,serif;font-weight:300;line-height:1.15;letter-spacing:-.02em;margin:0 0 1rem}
-.container{width:100%;max-width:calc(1200px + 4rem);margin:0 auto;padding:0 2rem}
-.site-header{position:fixed;top:0;left:0;right:0;height:80px;background:var(--color-bg);z-index:1000;border-bottom:1px solid var(--color-border)}
-.site-header .container{display:flex;align-items:center;gap:.25rem;height:100%}
-.skip-link{position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;z-index:10000}
-.article-hero{aspect-ratio:1200/640;overflow:hidden}
-.article-hero img{width:100%;height:100%;object-fit:cover}
-.img-skeleton{position:relative;overflow:hidden;background:var(--color-bg-light)}.img-skeleton img{opacity:1}
-.img-skeleton.loaded{animation:none;background:transparent}
-.img-skeleton.loaded img{opacity:1}
-@keyframes skeleton-pulse{0%{background-position:200% 0}100%{background-position:-200% 0}}
-</style>
-
-{# Full stylesheet loaded async for non-critical styles #}
-<link rel="preload" href="{{ get_url(path='style.css') }}" as="style" onload="this.onload=null;this.rel='stylesheet'">
-<noscript><link rel="stylesheet" href="{{ get_url(path='style.css') }}"></noscript>
+<link rel="stylesheet" href="{{ get_url(path='style.css') }}">
 
 {# Theme flash prevention - must run synchronously before page renders #}
 <script>

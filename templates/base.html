@@ -32,48 +32,6 @@
         <button class="lightbox-next" onclick="navigateLightbox(event, 1)" aria-label="{% if lang == 'en' %}Next{% elif lang == 'it' %}Successivo{% else %}Siguiente{% endif %}">&#10095;</button>
     </dialog>
 
-    <!-- Help Modal -->
-    <dialog id="help-modal" aria-labelledby="help-title" class="help-modal" onclick="closeHelpModal(event)">
-        <div class="help-modal-content" onclick="event.stopPropagation()">
-            <button class="help-modal-close" onclick="closeHelpModal(event)" aria-label="{% if lang == 'en' %}Close{% elif lang == 'it' %}Chiudi{% else %}Cerrar{% endif %}">&times;</button>
-            <h2 id="help-title">{% if lang == 'en' %}Keyboard Shortcuts{% elif lang == 'it' %}Scorciatoie da Tastiera{% else %}Atajos de Teclado{% endif %}</h2>
-            <label class="shortcuts-preference">
-                <input type="checkbox" id="enable-shortcuts">
-                {% if lang == 'en' %}Enable single-key shortcuts{% elif lang == 'it' %}Abilita scorciatoie con un solo tasto{% else %}Activar atajos de una sola tecla{% endif %}
-            </label>
-            <div class="shortcuts-list">
-                <div class="shortcut-item">
-                    <kbd>H</kbd>
-                    <span>{% if lang == 'en' %}Home{% elif lang == 'it' %}Home{% else %}Inicio{% endif %}</span>
-                </div>
-                <div class="shortcut-item">
-                    <kbd>S</kbd> / <kbd>/</kbd>
-                    <span>{% if lang == 'en' %}Search{% elif lang == 'it' %}Cerca{% else %}Buscar{% endif %}</span>
-                </div>
-                <div class="shortcut-item">
-                    <kbd>D</kbd>
-                    <span>{% if lang == 'en' %}Toggle dark mode{% elif lang == 'it' %}Attiva/disattiva tema scuro{% else %}Alternar modo oscuro{% endif %}</span>
-                </div>
-                <div class="shortcut-item">
-                    <kbd>L</kbd>
-                    <span>{% if lang == 'en' %}Switch language{% elif lang == 'it' %}Cambia lingua{% else %}Cambiar idioma{% endif %}</span>
-                </div>
-                <div class="shortcut-item">
-                    <kbd>J</kbd> / <kbd>K</kbd>
-                    <span>{% if lang == 'en' %}Next / Previous post{% elif lang == 'it' %}Post successivo / precedente{% else %}Post siguiente / anterior{% endif %}</span>
-                </div>
-                <div class="shortcut-item">
-                    <kbd>?</kbd>
-                    <span>{% if lang == 'en' %}Show help{% elif lang == 'it' %}Mostra aiuto{% else %}Mostrar ayuda{% endif %}</span>
-                </div>
-                <div class="shortcut-item">
-                    <kbd>Esc</kbd>
-                    <span>{% if lang == 'en' %}Close{% elif lang == 'it' %}Chiudi{% else %}Cerrar{% endif %}</span>
-                </div>
-            </div>
-        </div>
-    </dialog>
-
     <script defer src="{{ get_url(path='js/main.js') }}"></script>
 </body>
 </html>

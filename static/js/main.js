@@ -95,28 +95,6 @@ document.getElementById('lightbox').addEventListener('keydown', function(e) {
     if (e.key === 'ArrowRight') navigateLightbox(e, 1);
 });
 
-function openHelpModal() { showDialog(document.getElementById('help-modal')); }
-function closeHelpModal(event) {
-    if (!event || event.target.classList.contains('help-modal') || event.target.closest('.help-modal-close')) {
-        document.getElementById('help-modal').close();
-    }
-}
-
-document.querySelector('.help-toggle')?.addEventListener('click', openHelpModal);
-const shortcutsToggle = document.getElementById('enable-shortcuts');
-try { shortcutsToggle.checked = localStorage.getItem('shortcuts') === 'enabled'; } catch { /* Use the accessible default. */ }
-shortcutsToggle.addEventListener('change', () => {
-    try { localStorage.setItem('shortcuts', shortcutsToggle.checked ? 'enabled' : 'disabled'); } catch { /* Current-page preference still works. */ }
-});
-
-// Get home URL based on current language
-function getHomeUrl() {
-    const path = window.location.pathname;
-    if (path.startsWith('/en/') || path === '/en') return '/en/';
-    if (path.startsWith('/it/') || path === '/it') return '/it/';
-    return '/';
-}
-
 // Theme toggle functions
 function toggleTheme() {
     const isDark = document.documentElement.classList.toggle('theme-dark');
@@ -129,103 +107,14 @@ if (themeToggle) {
     themeToggle.addEventListener('click', toggleTheme);
 }
 
-// Global keyboard shortcuts
-document.addEventListener('keydown', function(e) {
-    // Ignore if typing in input/textarea
-    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable) return;
-
-    // Ignore if modifier keys are pressed
-    if (e.metaKey || e.ctrlKey || e.altKey) return;
-
-    // Check if any modal is open
-    const lightbox = document.getElementById('lightbox');
-    const helpModal = document.getElementById('help-modal');
-    const searchBox = document.querySelector('.search-box');
-    const isSearchOpen = searchBox && searchBox.classList.contains('active');
-
-    // If lightbox is open, let its handler deal with it
-    if (lightbox.open) return;
-
-    // Handle help modal
-    if (helpModal.open) {
-        if (e.key === 'Escape') {
-            closeHelpModal();
-            e.preventDefault();
-        }
-        return;
-    }
-
-    // Handle search being open
-    if (isSearchOpen) return;
-
-    // Character shortcuts are opt-in and can always be disabled in help.
-    if (!shortcutsToggle.checked) return;
-
-    // Global shortcuts
-    switch (e.key) {
-        case '?':
-            openHelpModal();
-            e.preventDefault();
-            break;
-        case 'h':
-        case 'H':
-            window.location.href = getHomeUrl();
-            e.preventDefault();
-            break;
-        case 's':
-        case 'S':
-        case '/':
-            const searchToggle = document.querySelector('.search-toggle');
-            if (searchToggle) {
-                searchToggle.click();
-                e.preventDefault();
-            }
-            break;
-        case 'd':
-        case 'D':
-            toggleTheme();
-            e.preventDefault();
-            break;
-        case 'l':
-        case 'L':
-            switchLanguage();
-            e.preventDefault();
-            break;
-        case 'j':
-        case 'J':
-            navigatePost('next');
-            e.preventDefault();
-            break;
-        case 'k':
-        case 'K':
-            navigatePost('prev');
-            e.preventDefault();
-            break;
-    }
-});
-
-// Post navigation shortcuts
-function navigatePost(direction) {
-    const selector = direction === 'next' ? '.nav-next' : '.nav-prev';
-    const link = document.querySelector('.post-navigation ' + selector);
-    if (link) {
-        window.location.href = link.href;
-    }
-}
-
-// Language switcher: cycle through ES → EN → IT → ES
-function switchLanguage() {
-    const links = Array.from(document.querySelectorAll('.lang-nav--desktop a'));
-    const current = links.findIndex(link => link.classList.contains('active'));
-    if (links.length > 1) window.location.href = links[(current + 1) % links.length].href;
-}
-
 // External links: open in new tab with icon
+// Permalinks are absolute, so a local preview must still treat the site's own domain as internal.
+const siteHostname = new URL(document.querySelector('link[rel="canonical"]')?.href || window.location.href).hostname;
 document.querySelectorAll('a[href^="http"]').forEach(function(link) {
     // Skip pagination and other internal navigation
     if (link.closest('.pagination')) return;
 
-    if (link.hostname !== window.location.hostname) {
+    if (link.hostname !== window.location.hostname && link.hostname !== siteHostname) {
         link.setAttribute('target', '_blank');
         link.setAttribute('rel', 'noopener noreferrer');
         // Don't add icon to elements that already have one (SVG inside or special card classes)
