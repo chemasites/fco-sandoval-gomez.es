@@ -563,9 +563,9 @@ main {
 
 .hero-grid {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 440px;
+    grid-template-columns: minmax(0, 1fr) clamp(320px, 38vw, 540px);
     gap: clamp(2rem, 6vw, 6rem);
-    align-items: end;
+    align-items: center;
 }
 
 .hero-tagline {
@@ -598,6 +598,7 @@ main {
     img {
         width: 100%;
         aspect-ratio: 440 / 520;
+        max-height: 72vh;
         object-fit: cover;
         mix-blend-mode: multiply;
     }
@@ -2575,10 +2576,6 @@ blockquote {
 }
 
 @media (max-width: 1024px) {
-    .hero-grid {
-        grid-template-columns: minmax(0, 1fr) 320px;
-    }
-
     .article-card a {
         grid-template-columns: 3rem minmax(0, 1fr) 200px;
         gap: 1.5rem;
@@ -2729,7 +2726,7 @@ blockquote {
     }
 
     .hero-background {
-        max-width: 440px;
+        max-width: 540px;
     }
 
     .article-card a,
