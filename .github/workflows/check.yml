@@ -28,6 +28,7 @@ jobs:
       - run: python3 .github/scripts/check-translations.py
       - run: zola build
       - run: python3 .github/scripts/check-metadata.py
+      - run: python3 .github/scripts/generate-llms.py
       - run: npx playwright install --with-deps chromium
         working-directory: .github/scripts
       - run: npm run test:browser -- ../../public

@@ -57,6 +57,9 @@ jobs:
       - name: Check page metadata and language links
         run: python3 .github/scripts/check-metadata.py
 
+      - name: Write llms.txt
+        run: python3 .github/scripts/generate-llms.py
+
       - name: Verify requested page is in the artifact
         if: inputs.content_path != ''
         env:

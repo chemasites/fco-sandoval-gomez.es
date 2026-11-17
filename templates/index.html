@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 
+{% block title %}{{ config.title }} | {{ config.extra.i18n[lang].hero_title | replace(from=".", to="") }}{% endblock %}
+
 {% block content %}
 {% set i18n = config.extra.i18n[lang] %}
 {% if lang == config.default_language %}{% set lang_prefix = "/" %}{% else %}{% set lang_prefix = "/" ~ lang ~ "/" %}{% endif %}

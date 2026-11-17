@@ -43,8 +43,8 @@ const server = http.createServer((req, res) => {
     page.on('request', req => { if (req.url().includes('search_index')) indexes++; });
     await page.goto(origin, { waitUntil: 'networkidle' });
     assert.equal(indexes, 0, 'Search index must not download until search opens');
-    await page.keyboard.press('d');
-    assert.equal(await page.locator('html').evaluate(el => el.classList.contains('theme-dark')), false, 'Single-letter keys must not change the page');
+    assert.equal(await page.locator('.articles-section .article-card a').first().getAttribute('target'), null, 'Own-site permalinks open in the same tab');
+    assert.equal(await page.locator('.index-row a').first().getAttribute('target'), '_blank', 'Research links open in a new tab');
     await page.locator('.search-toggle').click();
     await page.locator('#search-input').fill('caravaca');
     await page.waitForFunction(() => document.querySelectorAll('.search-result-item').length > 1);

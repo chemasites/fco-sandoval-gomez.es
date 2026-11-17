@@ -42,7 +42,8 @@
 {% endif %}
 <meta name="description" content="{{ meta_description }}">
 <meta name="author" content="{{ config.extra.author }}">
-<meta name="robots" content="index, follow">
+{% set is_error_page = not (page or section) or (page and page.slug == "404") %}
+<meta name="robots" content="{% if is_error_page %}noindex, follow{% else %}index, follow, max-image-preview:large{% endif %}">
 <link rel="canonical" href="{{ current_url or config.base_url }}">
 
 {# Pagination can differ between languages. Advertise only known equivalents. #}
@@ -62,7 +63,11 @@
 <meta property="og:description" content="{{ meta_description }}">
 <meta property="og:site_name" content="{{ config.title }}">
 <meta property="og:locale" content="{% if lang == 'en' %}en_US{% elif lang == 'it' %}it_IT{% else %}es_ES{% endif %}">
+{% for locale in ["es_ES", "en_US", "it_IT"] %}{% if locale is not starting_with(pat=lang) %}
+<meta property="og:locale:alternate" content="{{ locale }}">
+{% endif %}{% endfor %}
 <meta property="og:image" content="{{ meta_image_url }}">
+<meta property="og:image:alt" content="{{ meta_title }}">
 {% if not (meta_image is starting_with(pat="http")) %}
 {% set image_metadata = get_image_metadata(path=meta_image) %}
 <meta property="og:image:width" content="{{ image_metadata.width }}">
@@ -73,6 +78,7 @@
 <meta name="twitter:title" content="{{ meta_title }}">
 <meta name="twitter:description" content="{{ meta_description }}">
 <meta name="twitter:image" content="{{ meta_image_url }}">
+<meta name="twitter:image:alt" content="{{ meta_title }}">
 
 {# Article specific meta for blog posts #}
 {% if page %}
@@ -85,6 +91,9 @@
 <meta property="article:modified_time" content="{{ page.date | date(format='%Y-%m-%dT%H:%M:%S') }}">
 {% endif %}
 <meta property="article:author" content="{{ config.extra.author }}">
+{% if page.extra.category %}
+<meta property="article:section" content="{{ page.extra.category }}">
+{% endif %}
 {% endif %}
 
 <link rel="stylesheet" href="{{ get_url(path='style.css') }}">
@@ -107,79 +116,114 @@
 <link rel="alternate" type="application/atom+xml" title="{{ config.title }}" href="{{ get_url(path='atom.xml') }}">
 
 {# JSON strings are serialized and '<' escaped for script raw-text safety. #}
-{% if page and page.date %}
+{% set site_url = config.base_url %}
+{% set person_id = site_url ~ "/#person" %}
+{% set website_id = site_url ~ "/#website" %}
+{% set page_url = current_url or config.base_url %}
+{% set page_lang = lang or config.default_language %}
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
-  "@type": "Article",
-  "headline": {{ meta_title | json_encode() | replace(from="<", to="\\u003c") | safe }},
-  "description": {{ meta_description | json_encode() | replace(from="<", to="\\u003c") | safe }},
-  "image": {{ meta_image_url | json_encode() | replace(from="<", to="\\u003c") | safe }},
-  "author": {
-    "@type": "Person",
-    "name": {{ config.extra.author | json_encode() | replace(from="<", to="\\u003c") | safe }},
-    "url": {{ config.base_url | json_encode() | replace(from="<", to="\\u003c") | safe }}
-  },
-  "datePublished": {{ page.date | date(format="%Y-%m-%d") | json_encode() | replace(from="<", to="\\u003c") | safe }},
-  "dateModified": {{ (page.updated or page.date) | date(format="%Y-%m-%d") | json_encode() | replace(from="<", to="\\u003c") | safe }},
-  "mainEntityOfPage": {{ page.permalink | json_encode() | replace(from="<", to="\\u003c") | safe }}
-}
-</script>
-{% if page.ancestors | length > 0 %}
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "BreadcrumbList",
-  "itemListElement": [
-    {% for ancestor_path in page.ancestors %}
-    {% set ancestor = get_section(path=ancestor_path) %}
+  "@graph": [
     {
-      "@type": "ListItem",
-      "position": {{ loop.index }},
-      "name": {{ (ancestor.title or config.title) | json_encode() | replace(from="<", to="\\u003c") | safe }},
-      "item": {{ ancestor.permalink | json_encode() | replace(from="<", to="\\u003c") | safe }}
+      "@type": "Person",
+      "@id": {{ person_id | json_encode() | replace(from="<", to="\\u003c") | safe }},
+      "name": {{ config.extra.author | json_encode() | replace(from="<", to="\\u003c") | safe }},
+      "url": {{ config.base_url | json_encode() | replace(from="<", to="\\u003c") | safe }},
+      "image": {{ get_url(path="images/sando-navbar.jpg") | json_encode() | replace(from="<", to="\\u003c") | safe }},
+      "jobTitle": {{ config.extra.i18n[page_lang].job_title | json_encode() | replace(from="<", to="\\u003c") | safe }},
+      "knowsAbout": ["Arquitectura", "Conservación del patrimonio", "Arquitectura de tierra", "Análisis de ciclo de vida"],
+      "affiliation": { "@type": "CollegeOrUniversity", "name": "Universitat Politècnica de València" },
+      "sameAs": [
+        {{ config.extra.social.linkedin | json_encode() | replace(from="<", to="\\u003c") | safe }},
+        {{ config.extra.social.instagram | json_encode() | replace(from="<", to="\\u003c") | safe }},
+        {{ config.extra.social.researchgate | json_encode() | replace(from="<", to="\\u003c") | safe }}
+      ]
     },
-    {% endfor %}
     {
-      "@type": "ListItem",
-      "position": {{ page.ancestors | length + 1 }},
-      "name": {{ meta_title | json_encode() | replace(from="<", to="\\u003c") | safe }},
-      "item": {{ page.permalink | json_encode() | replace(from="<", to="\\u003c") | safe }}
+      "@type": "WebSite",
+      "@id": {{ website_id | json_encode() | replace(from="<", to="\\u003c") | safe }},
+      "name": {{ config.title | json_encode() | replace(from="<", to="\\u003c") | safe }},
+      "url": {{ config.base_url | json_encode() | replace(from="<", to="\\u003c") | safe }},
+      "inLanguage": ["es", "en", "it"],
+      "publisher": { "@id": {{ person_id | json_encode() | replace(from="<", to="\\u003c") | safe }} }
     }
+    {%- if page and page.date and not is_error_page %},
+    {
+      "@type": {% if page.path is containing(pat="/investigacion/") %}"ScholarlyArticle"{% else %}"Article"{% endif %},
+      "@id": {{ (page.permalink ~ "#article") | json_encode() | replace(from="<", to="\\u003c") | safe }},
+      "headline": {{ meta_title | json_encode() | replace(from="<", to="\\u003c") | safe }},
+      "description": {{ meta_description | json_encode() | replace(from="<", to="\\u003c") | safe }},
+      "image": {{ meta_image_url | json_encode() | replace(from="<", to="\\u003c") | safe }},
+      "inLanguage": {{ page.lang | json_encode() | replace(from="<", to="\\u003c") | safe }},
+      "author": { "@id": {{ person_id | json_encode() | replace(from="<", to="\\u003c") | safe }} },
+      "publisher": { "@id": {{ person_id | json_encode() | replace(from="<", to="\\u003c") | safe }} },
+      "datePublished": {{ page.date | date(format="%Y-%m-%d") | json_encode() | replace(from="<", to="\\u003c") | safe }},
+      "dateModified": {{ (page.updated or page.date) | date(format="%Y-%m-%d") | json_encode() | replace(from="<", to="\\u003c") | safe }},
+      {% if page.extra.category %}"articleSection": {{ page.extra.category | json_encode() | replace(from="<", to="\\u003c") | safe }},{% endif %}
+      {% if page.extra.url %}"sameAs": {{ page.extra.url | json_encode() | replace(from="<", to="\\u003c") | safe }},{% elif page.extra.links %}"sameAs": {{ page.extra.links[0].url | json_encode() | replace(from="<", to="\\u003c") | safe }},{% endif %}
+      "mainEntityOfPage": {{ page.permalink | json_encode() | replace(from="<", to="\\u003c") | safe }},
+      "isPartOf": { "@id": {{ website_id | json_encode() | replace(from="<", to="\\u003c") | safe }} }
+    }
+    {%- if page.ancestors | length > 0 %},
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {% for ancestor_path in page.ancestors %}
+        {% set ancestor = get_section(path=ancestor_path) %}
+        {
+          "@type": "ListItem",
+          "position": {{ loop.index }},
+          "name": {{ (ancestor.title or config.title) | json_encode() | replace(from="<", to="\\u003c") | safe }},
+          "item": {{ ancestor.permalink | json_encode() | replace(from="<", to="\\u003c") | safe }}
+        },
+        {% endfor %}
+        {
+          "@type": "ListItem",
+          "position": {{ page.ancestors | length + 1 }},
+          "name": {{ meta_title | json_encode() | replace(from="<", to="\\u003c") | safe }},
+          "item": {{ page.permalink | json_encode() | replace(from="<", to="\\u003c") | safe }}
+        }
+      ]
+    }
+    {%- endif %}
+    {%- elif page and not is_error_page %},
+    {
+      "@type": {% if page.extra.template == "sobre-mi.html" or page.slug == "sobre-mi" %}"ProfilePage"{% else %}"WebPage"{% endif %},
+      "@id": {{ page_url | json_encode() | replace(from="<", to="\\u003c") | safe }},
+      "name": {{ meta_title | json_encode() | replace(from="<", to="\\u003c") | safe }},
+      "description": {{ meta_description | json_encode() | replace(from="<", to="\\u003c") | safe }},
+      "url": {{ page_url | json_encode() | replace(from="<", to="\\u003c") | safe }},
+      "inLanguage": {{ page_lang | json_encode() | replace(from="<", to="\\u003c") | safe }},
+      {% if page.slug == "sobre-mi" %}"mainEntity": { "@id": {{ person_id | json_encode() | replace(from="<", to="\\u003c") | safe }} },{% else %}"about": { "@id": {{ person_id | json_encode() | replace(from="<", to="\\u003c") | safe }} },{% endif %}
+      "isPartOf": { "@id": {{ website_id | json_encode() | replace(from="<", to="\\u003c") | safe }} }
+    }
+    {%- elif section and section.relative_path is not starting_with(pat="_index") %},
+    {
+      "@type": "CollectionPage",
+      "@id": {{ page_url | json_encode() | replace(from="<", to="\\u003c") | safe }},
+      "name": {{ meta_title | json_encode() | replace(from="<", to="\\u003c") | safe }},
+      "description": {{ meta_description | json_encode() | replace(from="<", to="\\u003c") | safe }},
+      "url": {{ page_url | json_encode() | replace(from="<", to="\\u003c") | safe }},
+      "inLanguage": {{ page_lang | json_encode() | replace(from="<", to="\\u003c") | safe }},
+      "author": { "@id": {{ person_id | json_encode() | replace(from="<", to="\\u003c") | safe }} },
+      "isPartOf": { "@id": {{ website_id | json_encode() | replace(from="<", to="\\u003c") | safe }} }
+    }
+    {%- elif section %},
+    {
+      "@type": "WebPage",
+      "@id": {{ page_url | json_encode() | replace(from="<", to="\\u003c") | safe }},
+      "name": {{ meta_title | json_encode() | replace(from="<", to="\\u003c") | safe }},
+      "description": {{ meta_description | json_encode() | replace(from="<", to="\\u003c") | safe }},
+      "url": {{ page_url | json_encode() | replace(from="<", to="\\u003c") | safe }},
+      "inLanguage": {{ page_lang | json_encode() | replace(from="<", to="\\u003c") | safe }},
+      "about": { "@id": {{ person_id | json_encode() | replace(from="<", to="\\u003c") | safe }} },
+      "isPartOf": { "@id": {{ website_id | json_encode() | replace(from="<", to="\\u003c") | safe }} }
+    }
+    {%- endif %}
   ]
 }
 </script>
-{% endif %}
-{% elif page %}
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "WebPage",
-  "name": {{ meta_title | json_encode() | replace(from="<", to="\\u003c") | safe }},
-  "url": {{ page.permalink | json_encode() | replace(from="<", to="\\u003c") | safe }}
-}
-</script>
-{% else %}
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "WebSite",
-  "name": {{ config.title | json_encode() | replace(from="<", to="\\u003c") | safe }},
-  "url": {{ config.base_url | json_encode() | replace(from="<", to="\\u003c") | safe }},
-  "inLanguage": {{ (lang or config.default_language) | json_encode() | replace(from="<", to="\\u003c") | safe }},
-  "author": {
-    "@type": "Person",
-    "name": {{ config.extra.author | json_encode() | replace(from="<", to="\\u003c") | safe }},
-    "jobTitle": {{ config.extra.i18n[lang].job_title | json_encode() | safe }},
-    "sameAs": [
-      {{ config.extra.social.linkedin | json_encode() | replace(from="<", to="\\u003c") | safe }},
-      {{ config.extra.social.instagram | json_encode() | replace(from="<", to="\\u003c") | safe }},
-      {{ config.extra.social.researchgate | json_encode() | replace(from="<", to="\\u003c") | safe }}
-    ]
-  }
-}
-</script>
-{% endif %}
 
 {# Cronitor RUM #}
 <script async src="https://rum.cronitor.io/script.js"></script>
